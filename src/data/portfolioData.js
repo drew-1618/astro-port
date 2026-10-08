@@ -1,0 +1,517 @@
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  PORTFOLIO DATA — the single source of truth for every piece of content.
+ *
+ *  Add a project / role / photo / skill by appending an object to the relevant
+ *  array below. The starfield, navigation, cards and modals are all generated
+ *  from these arrays; no component code needs to change.
+ *
+ *  Entries marked `// SAMPLE` are placeholders to replace with real data.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+import { dms, hms } from './skyCatalog';
+
+export const profile = {
+  name: 'Andrew Garrett Johnson',
+  initials: 'AGJ',
+  callsign: 'OBS-AGJ',
+  title: 'CS @ Tennessee Tech · Math Minor',
+  location: 'Cookeville, TN / Knoxville, TN',
+  // Observatory "site" shown in the HUD. Approximate, Cookeville TN.
+  site: { name: 'Cookeville, TN', lat: 36.16, lon: -85.5 },
+  email: 'andrewjohnson11235@gmail.com',
+  links: {
+    github: 'https://github.com/drew-1618',
+    linkedin: 'https://www.linkedin.com/in/andrew-garrett-j',
+  },
+  summary:
+    'Computer Science student (Mathematics minor) at Tennessee Tech with two co-op rotations at Adtran across software test automation and technical solutions engineering. I like work that sits where software meets hardware: networks, embedded radios, CI pipelines, and the occasional night under a dark sky.',
+};
+
+/*
+ * Sectors map 1:1 to content arrays via `key`, and each lives in a real
+ * constellation (see skyCatalog.js). The five are neighbours in the winter
+ * sky, clustered around Orion. Every item in a sector is drawn as a real star
+ * of that constellation: set `star` on the item to pick which one, or leave
+ * it out to take the next brightest unused star. Items with `coords` (e.g.
+ * astrophotos) are placed at those exact RA/Dec coordinates instead.
+ * `modalKind` decides whether clicking a star opens the ObservationModal
+ * (project | role | photo) or scrolls the sector panel to that entry (null).
+ */
+export const sectors = [
+  {
+    id: 'alpha',
+    short: 'Projects', // mobile tab-bar label
+    key: 'projects',
+    name: 'Sector Alpha',
+    subtitle: 'The Stellar Nursery',
+    description: 'Featured engineering & software projects.',
+    constellation: 'Orion',
+    modalKind: 'project',
+    icon: 'Sparkles',
+  },
+  {
+    id: 'beta',
+    short: 'Experience', // mobile tab-bar label
+    key: 'experience',
+    name: 'Sector Beta',
+    subtitle: 'Orbital Logs',
+    description: 'Professional experience, co-ops & roles.',
+    constellation: 'Taurus',
+    modalKind: 'role',
+    icon: 'Orbit',
+  },
+  {
+    id: 'gamma',
+    short: 'Skills', // mobile tab-bar label
+    key: 'skills',
+    name: 'Sector Gamma',
+    subtitle: 'Deep-Sky Sensor Array',
+    description: 'Languages, tooling, systems & instrumentation.',
+    constellation: 'Gemini',
+    modalKind: null,
+    icon: 'Radar',
+  },
+  {
+    id: 'delta',
+    short: 'Astro', // mobile tab-bar label
+    key: 'astrophotos',
+    name: 'Sector Delta',
+    subtitle: 'Observational Logbook',
+    description: 'Astrophotography & visual imaging.',
+    constellation: 'Auriga',
+    modalKind: 'photo',
+    icon: 'Aperture',
+  },
+  {
+    id: 'epsilon',
+    short: 'Education', // mobile tab-bar label
+    key: 'education',
+    name: 'Sector Epsilon',
+    subtitle: 'Origins & Ground Station',
+    description: 'Education, academics & comms.',
+    constellation: 'Canis Major',
+    modalKind: null,
+    icon: 'RadioTower',
+    // Extra stars that aren't backed by a content array entry.
+    extraStars: [{ id: 'comms', title: 'Transmission Terminal', star: 'Sirius' }],
+  },
+];
+
+export const projects = [
+  {
+    id: 'gocandidit',
+    star: 'Betelgeuse',
+    targetId: 'AGJ-0001',
+    title: 'GoCandidIt',
+    context: 'Personal Project',
+    classification: ['Full-Stack', 'Desktop', 'AI Integration'],
+    timeline: { start: 'Summer 2026', end: null },
+    summary:
+      'A multi-platform resume builder with an Electron desktop client and a dynamic web frontend, backed by an AI content pipeline.',
+    description:
+      'GoCandidIt is a resume builder that runs as both an Electron desktop app and a web app against one shared backend. A Node.js + Express API persists resumes in SQLite, ships as a Docker container, and calls out to AI APIs over REST endpoints to generate content tailored to a specific job posting. Local authentication scopes state per user and keeps a full version history of every resume.',
+    architecture: [
+      'Electron desktop client and dynamic web frontend sharing a single REST API.',
+      'Node.js + Express service layer backed by SQLite, containerised with Docker.',
+      'AI APIs integrated via RESTful endpoints to automate tailored content generation.',
+      'Local authentication managing per-user state and resume version history.',
+    ],
+    metrics: [
+      { label: 'Clients', value: 'Desktop + Web' },
+      { label: 'Persistence', value: 'SQLite' },
+      { label: 'Deploy', value: 'Docker' },
+      { label: 'History', value: 'Versioned' },
+    ],
+    stack: ['Electron', 'Node.js', 'Express', 'SQLite', 'Docker', 'REST', 'AI APIs'],
+    repo: 'https://github.com/drew-1618/gocandidit',
+    demo: null,
+    featured: true,
+  },
+  {
+    id: 'range-sentinel',
+    star: 'Rigel',
+    targetId: 'AGJ-0002',
+    title: 'Range Sentinel',
+    context: 'Collaborative Project',
+    classification: ['IoT', 'Embedded', 'Long-Range Radio'],
+    timeline: { start: 'Spring 2026', end: 'Spring 2026' },
+    summary:
+      'A long-range, internet-free IoT network of ESP32 + LoRa nodes that monitors cattle gates and property perimeters.',
+    description:
+      'Range Sentinel watches rural property where there is no Wi-Fi or cellular coverage. ESP32 microcontrollers paired with LoRa radios report gate and perimeter state over long-range links back to a base node. The base ESP32 serves its own web dashboard (HTML, Bootstrap, CSS, JavaScript) straight out of LittleFS flash, so anyone nearby gets real-time status from a phone with no internet connection.',
+    architecture: [
+      'ESP32 sensor nodes transmitting gate / perimeter state over LoRa radio.',
+      'Fully offline topology — no internet or cellular dependency.',
+      'Dashboard (HTML, Bootstrap, CSS, JS) stored in LittleFS and served by the ESP32 itself.',
+      'Real-time feedback pushed to the local dashboard as node events arrive.',
+    ],
+    metrics: [
+      { label: 'Link', value: 'LoRa' },
+      { label: 'Internet', value: 'Not required' },
+      { label: 'MCU', value: 'ESP32' },
+      { label: 'Storage', value: 'LittleFS' },
+    ],
+    stack: ['ESP32', 'LoRa', 'LittleFS', 'HTML', 'Bootstrap', 'JavaScript'],
+    repo: null,
+    demo: null,
+    featured: true,
+  },
+  {
+    id: 'kmeans-palette',
+    star: 'Bellatrix',
+    targetId: 'AGJ-0003',
+    title: 'K-Means Color Palette Generator',
+    context: 'Personal Project',
+    classification: ['Machine Learning', 'Computer Vision', 'Unsupervised'],
+    timeline: { start: 'November 2025', end: 'November 2025' },
+    summary:
+      'Unsupervised ML tool that extracts dominant color schemes from images by clustering pixels in perceptual L*a*b* space.',
+    description:
+      'The tool converts an image into the L*a*b* color space, where Euclidean distance roughly matches how people perceive color difference, and then clusters its pixels with scikit-learn K-Means to pull out the dominant palette. It picks the number of clusters itself: the Elbow Method scores a range of k values and a Knee Locator finds the inflection point, so k never has to be tuned by hand.',
+    architecture: [
+      'Pixel data converted to L*a*b* for perceptually accurate distance.',
+      'scikit-learn K-Means clustering to isolate dominant colors.',
+      'Elbow Method + Knee Locator to programmatically select optimal k.',
+      'Automated hyperparameter tuning — no manual cluster count required.',
+    ],
+    metrics: [
+      { label: 'Color Space', value: 'L*a*b*' },
+      { label: 'Model', value: 'K-Means' },
+      { label: 'k Selection', value: 'Elbow + Knee' },
+      { label: 'Tuning', value: 'Automated' },
+    ],
+    stack: ['Python', 'scikit-learn', 'Kneed'],
+    repo: 'https://github.com/drew-1618/K-Means_image_palette_extractor',
+    demo: null,
+    featured: false,
+  },
+  {
+    id: 'net-degradation-sim',
+    star: 'Saiph',
+    targetId: 'AGJ-0004',
+    title: 'Network Degradation Simulator',
+    context: 'Adtran Hackathon Project',
+    classification: ['Networking', 'Simulation', 'Visualization'],
+    timeline: { start: 'November 2025', end: 'November 2025' },
+    summary:
+      'Real-time visualizer showing how latency, packet loss and jitter change user experience across LAN, Wi-Fi, LTE and satellite links.',
+    description:
+      'Built at an Adtran hackathon, the simulator shows what bad network conditions feel like to a user. A custom degradation engine runs traffic through an asynchronous queue that adds latency, packet loss and jitter, using profiles modelled on LAN, Wi-Fi, 4G LTE and satellite links. A Pygame front end renders the effect in real time, so the trade-offs are easy to see when evaluating UX under tight network budgets.',
+    architecture: [
+      'Asynchronous queue-based degradation engine injecting latency, loss and jitter.',
+      'Connection profiles modelling LAN, Wi-Fi, 4G LTE and Satellite links.',
+      'Real-time Pygame visualizer rendering the user-facing impact.',
+    ],
+    metrics: [
+      { label: 'Link Profiles', value: '4' },
+      { label: 'Impairments', value: 'Latency · Loss · Jitter' },
+      { label: 'Engine', value: 'Async queue' },
+      { label: 'Event', value: 'Hackathon' },
+    ],
+    stack: ['Python', 'Pygame', 'asyncio'],
+    repo: 'https://github.com/drew-1618/network-degredation-simulator',
+    demo: null,
+    featured: false,
+  },
+];
+
+export const experience = [
+  {
+    id: 'adtran-solutions',
+    star: 'Aldebaran',
+    missionId: 'MSN-2026-B',
+    org: 'Adtran Inc.',
+    role: 'Technical Sales & Solutions Engineering Co-Op',
+    location: 'Huntsville, AL',
+    start: 'May 2026',
+    end: 'August 2026',
+    summary:
+      'Customer-facing lab engineering: reproducing field issues, standing up orchestration platforms, and evaluating device coverage.',
+    impact: [
+      'Reverse-engineered a complex, non-standard switch CLI to configure port flows, flowpoint shapers, and policers, successfully reproducing and troubleshooting a customer SFP auto-negotiation issue.',
+      'Deployed Oktopus on Ubuntu and optimized the system messaging architecture by migrating the MQTT broker to Eclipse Mosquitto for low-latency device orchestration.',
+      'Staged enterprise cloud platforms on bare-metal Rocky Linux servers using KVM and SSH for customer lab testing.',
+      'Authored NPI documentation and conducted comparative SDG coverage testing to evaluate device performance.',
+    ],
+    tools: ['Oktopus', 'MQTT', 'Eclipse Mosquitto', 'Ubuntu', 'Rocky Linux', 'KVM', 'SSH', 'SFP / Switch CLI'],
+  },
+  {
+    id: 'adtran-swdev',
+    star: 'Elnath',
+    missionId: 'MSN-2025-A',
+    org: 'Adtran Inc.',
+    role: 'Software Development Co-Op',
+    location: 'Huntsville, AL',
+    start: 'August 2025',
+    end: 'December 2025',
+    summary:
+      'Test automation and CI/CD engineering for traffic policing and QoS features on carrier networking gear.',
+    impact: [
+      'Developed automated test scenarios using Python and Behave to validate traffic policing and QoS functionality.',
+      'Optimized the test execution process by implementing a dynamic tagging system, allowing developers to isolate specific feature tests and significantly reduce execution time.',
+      'Diagnosed and resolved complex integration issues, including a byte-count discrepancy on aggregation switches, by identifying and mitigating root-cause vendor hardware constraints.',
+      'Enhanced CI/CD reliability by upgrading Jenkins pipelines and Bash scripts to support automated firmware version detection and backward compatibility.',
+    ],
+    tools: ['Python', 'Behave', 'Jenkins', 'Groovy', 'Bash', 'QoS / Policing'],
+  },
+  {
+    id: 'pstcc-tutor',
+    star: 'Ain',
+    missionId: 'MSN-2025-T',
+    org: 'Pellissippi State Community College',
+    role: 'Academic Tutor',
+    location: 'Knoxville, TN',
+    start: 'January 2025',
+    end: 'May 2025',
+    summary: 'Tutoring C++, data structures, algorithms and calculus.',
+    impact: [
+      'Guided students in C++, data structures, algorithms, and calculus, adapting teaching methods for student needs.',
+      'Conducted real-time virtual code reviews to identify common sticking points and strengthen students’ debugging methodologies, enhancing their problem-solving abilities.',
+      'Provided technical guidance on low-level data manipulation and troubleshooting, helping students resolve logic errors related to direct memory access.',
+    ],
+    tools: ['C++', 'Data Structures', 'Algorithms', 'Calculus'],
+  },
+];
+
+export const skills = [
+  {
+    id: 'languages',
+    star: 'Pollux',
+    group: 'Languages',
+    band: 'B',
+    items: [
+      { name: 'Python' },
+      { name: 'C++' },
+      { name: 'JavaScript' },
+      { name: 'R' },
+      { name: 'SQL', note: 'MySQL · SQLite' },
+      { name: 'Bash' },
+      { name: 'Groovy' },
+      { name: 'HTML/CSS' },
+    ],
+  },
+  {
+    id: 'frameworks',
+    star: 'Castor',
+    group: 'Frameworks & Backend',
+    band: 'V',
+    items: [
+      { name: 'Node.js' },
+      { name: 'Express' },
+      { name: 'Electron' },
+      { name: 'Behave', note: 'BDD testing' },
+      { name: 'MySQL' },
+      { name: 'SQLite' },
+      { name: 'Bootstrap' },
+      { name: 'REST APIs' },
+    ],
+  },
+  {
+    id: 'systems',
+    star: 'Alhena',
+    group: 'Hardware/Embedded & Systems',
+    band: 'R',
+    items: [
+      { name: 'ESP32' },
+      { name: 'LoRa' },
+      { name: 'LittleFS' },
+      { name: 'Linux', note: 'Ubuntu · Rocky' },
+      { name: 'KVM' },
+      { name: 'SSH' },
+      { name: 'MQTT', note: 'Eclipse Mosquitto' },
+      { name: 'Docker' },
+      { name: 'Jenkins' },
+      { name: 'Git / GitHub' },
+      { name: 'Vim' },
+      { name: 'VS Code' },
+    ],
+  },
+  {
+    id: 'data',
+    star: 'Mebsuta',
+    group: 'Data Science/AI',
+    band: 'I',
+    items: [
+      { name: 'scikit-learn' },
+      { name: 'K-Means / Clustering' },
+      { name: 'Jupyter' },
+      { name: 'RStudio' },
+      { name: 'AI API Integration' },
+    ],
+  },
+  {
+    id: 'optics',
+    star: 'Wasat',
+    group: 'Optical/Astrophotography Gear',
+    band: 'Hα',
+    // SAMPLE — replace with your actual kit.
+    items: [
+      { name: 'Refractor (sample)', note: '80mm f/6 APO' },
+      { name: 'EQ Mount (sample)', note: 'GoTo, autoguided' },
+      { name: 'Astro Camera (sample)', note: 'Cooled CMOS' },
+      { name: 'DSLR (sample)', note: 'Wide-field / lunar' },
+      { name: 'Filters (sample)', note: 'Dual-band Hα/OIII' },
+      { name: 'PixInsight / Siril (sample)' },
+    ],
+  },
+];
+
+/*
+ * Astrophotography captures. Set `image` to a path under /public (e.g.
+ * '/astro/m42.jpg') to replace the procedural placeholder. `placeholder`
+ * controls the generated preview when `image` is null. `coords` (J2000) puts
+ * the capture's star at the target's real position in the sky; leave it out
+ * for solar-system targets and it will take a star in the sector instead.
+ */
+const SAMPLE_OPTICS = {
+  telescope: '80mm APO Refractor (sample)',
+  focalLength: '480mm',
+  mount: 'GoTo EQ Mount (sample)',
+  camera: 'Cooled CMOS (sample)',
+};
+
+export const astrophotos = [
+  // SAMPLE — replace
+  {
+    id: 'm36',
+    target: 'Pinwheel Cluster',
+    catalogId: 'M36 / NGC 1960',
+    type: 'Open Cluster',
+    coords: { ra: hms(5, 36, 18), dec: dms(34, 8) },
+    image: null,
+    placeholder: { kind: 'cluster', seed: 36 },
+    optics: SAMPLE_OPTICS,
+    integration: { subs: 90, subExposure: '60s', isoGain: 'Gain 100', totalTime: '1h 30m', filters: 'UV/IR Cut', barlow: null },
+    processing: ['Siril', 'PixInsight'],
+    date: '2025-01-24',
+    location: 'Bortle 4 site, TN (sample)',
+    notes: 'Young cluster of hot blue stars about 4,100 light years away.',
+  },
+  // SAMPLE — replace
+  {
+    id: 'm37',
+    target: 'Salt and Pepper Cluster',
+    catalogId: 'M37 / NGC 2099',
+    type: 'Open Cluster',
+    coords: { ra: hms(5, 52, 18), dec: dms(32, 33) },
+    image: null,
+    placeholder: { kind: 'cluster', seed: 37 },
+    optics: SAMPLE_OPTICS,
+    integration: { subs: 120, subExposure: '60s', isoGain: 'Gain 100', totalTime: '2h 00m', filters: 'UV/IR Cut', barlow: null },
+    processing: ['Siril', 'PixInsight'],
+    date: '2025-01-24',
+    location: 'Bortle 4 site, TN (sample)',
+    notes: 'The richest of Auriga\'s three Messier clusters, with an orange giant near its core.',
+  },
+  // SAMPLE — replace
+  {
+    id: 'm38',
+    target: 'Starfish Cluster',
+    catalogId: 'M38 / NGC 1912',
+    type: 'Open Cluster',
+    coords: { ra: hms(5, 28, 42), dec: dms(35, 51) },
+    image: null,
+    placeholder: { kind: 'cluster', seed: 38 },
+    optics: SAMPLE_OPTICS,
+    integration: { subs: 90, subExposure: '60s', isoGain: 'Gain 100', totalTime: '1h 30m', filters: 'UV/IR Cut', barlow: null },
+    processing: ['Siril'],
+    date: '2025-01-25',
+    location: 'Bortle 4 site, TN (sample)',
+    notes: 'Cross-shaped asterism, with the small cluster NGC 1907 just to the south.',
+  },
+  // SAMPLE — replace
+  {
+    id: 'ic405',
+    target: 'Flaming Star Nebula',
+    catalogId: 'IC 405 / Caldwell 31',
+    type: 'Emission / Reflection Nebula',
+    coords: { ra: hms(5, 16, 5), dec: dms(34, 27) },
+    image: null,
+    placeholder: { kind: 'nebula', seed: 405 },
+    optics: SAMPLE_OPTICS,
+    integration: { subs: 160, subExposure: '180s', isoGain: 'Gain 100', totalTime: '8h 00m', filters: 'Dual-band Hα/OIII', barlow: null },
+    processing: ['Siril', 'GraXpert', 'PixInsight'],
+    date: '2024-12-14',
+    location: 'Bortle 4 site, TN (sample)',
+    notes: 'Lit by the runaway star AE Aurigae; HOO palette from a dual-band filter.',
+  },
+  // SAMPLE — replace
+  {
+    id: 'ic410',
+    target: 'Tadpoles Nebula',
+    catalogId: 'IC 410',
+    type: 'Emission Nebula',
+    coords: { ra: hms(5, 22, 44), dec: dms(33, 22) },
+    image: null,
+    placeholder: { kind: 'nebula', seed: 410 },
+    optics: SAMPLE_OPTICS,
+    integration: { subs: 140, subExposure: '180s', isoGain: 'Gain 100', totalTime: '7h 00m', filters: 'Dual-band Hα/OIII', barlow: null },
+    processing: ['Siril', 'PixInsight', 'Photoshop'],
+    date: '2024-12-15',
+    location: 'Bortle 4 site, TN (sample)',
+    notes: 'Two "tadpole" gas streamers near the young cluster NGC 1893.',
+  },
+  // SAMPLE — replace
+  {
+    id: 'm1',
+    target: 'Crab Nebula',
+    catalogId: 'M1 / NGC 1952',
+    type: 'Supernova Remnant',
+    coords: { ra: hms(5, 34, 31.9), dec: dms(22, 0, 52) },
+    image: null,
+    placeholder: { kind: 'nebula', seed: 1054 },
+    optics: { ...SAMPLE_OPTICS, telescope: '8" SCT (sample)', focalLength: '1280mm (w/ 0.63x reducer)' },
+    integration: { subs: 200, subExposure: '120s', isoGain: 'Gain 120', totalTime: '6h 40m', filters: 'Dual-band Hα/OIII', barlow: null },
+    processing: ['Siril', 'PixInsight'],
+    date: '2025-02-02',
+    location: 'Bortle 5 backyard, TN (sample)',
+    notes: 'Remnant of the supernova seen in 1054 AD, sitting just off the tip of Taurus near ζ Tau.',
+  },
+];
+
+export const education = [
+  {
+    id: 'ttu',
+    star: 'Adhara',
+    school: 'Tennessee Technological University',
+    location: 'Cookeville, TN',
+    degree: 'Bachelor of Science in Computer Science',
+    concentration: 'Minor in Mathematics',
+    gpa: '3.86',
+    start: null,
+    end: 'Expected December 2026',
+    honors: [],
+    milestones: [],
+  },
+  {
+    id: 'pstcc',
+    star: 'Mirzam',
+    school: 'Pellissippi State Community College',
+    location: 'Knoxville, TN',
+    degree: 'Associate of Science in Computer Science',
+    concentration: null,
+    gpa: '3.92',
+    start: null,
+    end: 'May 2024',
+    honors: ['Phi Theta Kappa Honor Society'],
+    milestones: [
+      { label: 'TNCIS Study Abroad — Greece', date: '2023' },
+      { label: 'TNCIS Study Abroad — The Alps', date: '2024' },
+    ],
+  },
+];
+
+/* Maps a sector `key` to its content array. */
+export const collections = { projects, experience, skills, astrophotos, education };
+
+/* Every item that gets a star in the given sector's cluster. */
+export function sectorItems(sector) {
+  return [...(collections[sector.key] || []), ...(sector.extraStars || [])];
+}
+
+/* Display label for a star belonging to any collection. */
+export function itemLabel(item) {
+  return item.title || item.role || item.group || item.target || item.school || item.id;
+}
