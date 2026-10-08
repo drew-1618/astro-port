@@ -106,17 +106,17 @@ export default function HudOverlay({
   const site = `${profile.site.name} · ${Math.abs(profile.site.lat).toFixed(2)}°${profile.site.lat >= 0 ? 'N' : 'S'} ${Math.abs(profile.site.lon).toFixed(2)}°${profile.site.lon >= 0 ? 'E' : 'W'}`;
 
   const toggles = (
-    <div className="flex shrink-0 items-center gap-1.5">
-      <button type="button" className="hud-btn min-w-[36px] px-2 xl:px-2.5" aria-pressed={audioOn} onClick={onToggleAudio} title="Ambient audio" aria-label="Ambient audio">
-        {audioOn ? <Volume2 size={15} aria-hidden /> : <VolumeX size={15} aria-hidden />}
+    <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+      <button type="button" className="hud-btn min-w-[36px] px-1.5 sm:min-w-[40px] sm:px-2 xl:px-3" aria-pressed={audioOn} onClick={onToggleAudio} title="Ambient audio" aria-label="Ambient audio">
+        {audioOn ? <Volume2 size={16} aria-hidden /> : <VolumeX size={16} aria-hidden />}
         <span className="hidden xl:inline">Audio</span>
       </button>
-      <button type="button" className="hud-btn min-w-[36px] px-2 xl:px-2.5" aria-pressed={redMode} onClick={onToggleRed} title="Dark-sky red filter" aria-label="Dark-sky red filter">
-        {redMode ? <Eye size={15} aria-hidden /> : <Moon size={15} aria-hidden />}
+      <button type="button" className="hud-btn min-w-[36px] px-1.5 sm:min-w-[40px] sm:px-2 xl:px-3" aria-pressed={redMode} onClick={onToggleRed} title="Dark-sky red filter" aria-label="Dark-sky red filter">
+        {redMode ? <Eye size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
         <span className="hidden xl:inline">Red filter</span>
       </button>
-      <button type="button" className="hud-btn min-w-[36px] px-2 xl:px-2.5" onClick={onRecenter} title="Recenter camera" aria-label="Recenter camera">
-        <LocateFixed size={15} aria-hidden />
+      <button type="button" className="hud-btn min-w-[36px] px-1.5 sm:min-w-[40px] sm:px-2 xl:px-3" onClick={onRecenter} title="Recenter camera" aria-label="Recenter camera">
+        <LocateFixed size={16} aria-hidden />
         <span className="hidden xl:inline">Recenter</span>
       </button>
     </div>
@@ -125,15 +125,15 @@ export default function HudOverlay({
   return (
     <div className="pointer-events-none fixed inset-0 z-20 font-mono">
       {/* Header */}
-      <header className="pointer-events-auto absolute inset-x-0 top-0 border-b border-line/10 bg-gradient-to-b from-bg/95 to-bg/60 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-[2px] lg:px-4 lg:py-3 land:py-1.5 land:pl-[max(0.75rem,env(safe-area-inset-left))] land:pr-[max(0.75rem,env(safe-area-inset-right))]">
+      <header data-occluder className="pointer-events-auto absolute inset-x-0 top-0 border-b border-line/10 bg-gradient-to-b from-bg/95 to-bg/60 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-[2px] lg:px-4 lg:py-3 land:py-1.5 land:pl-[max(0.75rem,env(safe-area-inset-left))] land:pr-[max(0.75rem,env(safe-area-inset-right))]">
         <div className="flex items-center justify-between gap-3">
           <button type="button" onClick={onRecenter} className="focus-ring flex min-w-0 items-center gap-2.5 text-left lg:gap-3" aria-label="Recenter to all-sky view">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-accent/50 text-[10px] font-bold text-accent land:h-7 land:w-7">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-accent/50 text-xs font-bold text-accent land:h-7 land:w-7">
               {profile.initials}
             </span>
             <span className="min-w-0">
-              <span className="block truncate font-sans text-sm font-semibold text-ink">{profile.name}</span>
-              <span className="block text-[10px] uppercase leading-tight tracking-[0.06em] text-muted sm:truncate sm:tracking-[0.18em] land:hidden">
+              <span className="block truncate font-sans text-sm font-semibold text-ink sm:text-[15px]">{profile.name}</span>
+              <span className="block text-xs uppercase leading-tight tracking-[0.06em] text-muted sm:truncate sm:tracking-[0.12em] land:hidden">
                 {/* On narrow screens wrap at the "·" separators, never mid-phrase. */}
                 {profile.title.split(' · ').map((part, i) => (
                   <span key={part}>
@@ -148,7 +148,7 @@ export default function HudOverlay({
 
           {/* Status: desktop + landscape inline */}
           <div className="hidden min-w-0 items-center gap-6 lg:flex land:flex" aria-live="polite">
-            <span className="flex min-w-0 max-w-[340px] items-center gap-2 truncate whitespace-nowrap text-[11px] uppercase tracking-[0.2em] text-accent land:max-w-[240px] land:text-[10px] land:tracking-[0.12em]">
+            <span className="flex min-w-0 max-w-[340px] items-center gap-2 truncate whitespace-nowrap text-[13px] uppercase tracking-[0.14em] text-accent land:max-w-[240px] land:text-xs land:tracking-[0.12em]">
               <StatusDot slewing={slewing} />
               <span className="truncate">{status}</span>
             </span>
@@ -159,12 +159,12 @@ export default function HudOverlay({
         </div>
 
         {/* Mobile second row: status + live sky coordinates */}
-        <div className="mt-1.5 flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.12em] lg:hidden land:hidden" aria-live="polite">
+        <div className="mt-1.5 flex items-center justify-between gap-3 text-xs uppercase tracking-[0.12em] lg:hidden land:hidden" aria-live="polite">
           <span className="flex min-w-0 items-center gap-1.5 text-accent">
             <StatusDot slewing={slewing} />
             <span className="truncate">{status}</span>
           </span>
-          <span className="shrink-0 tabular-nums text-muted">
+          <span className="shrink-0 text-[11px] tabular-nums text-muted sm:text-xs">
             {formatRA(ra).slice(0, 7)} <span className="text-muted/60">·</span> {formatDec(dec).slice(0, 8)}
             {' '}
             <span className="text-muted/60">·</span> {fov}°
@@ -173,7 +173,7 @@ export default function HudOverlay({
       </header>
 
       {/* Desktop navigation dock */}
-      <nav aria-label="Sectors" className="pointer-events-auto absolute left-4 top-1/2 hidden -translate-y-1/2 flex-col gap-2 lg:flex">
+      <nav data-occluder aria-label="Sectors" className="pointer-events-auto absolute left-4 top-1/2 hidden -translate-y-1/2 flex-col gap-2 lg:flex">
         <span className="hud-label mb-1 pl-1">GoTo · Sectors</span>
         {sectors.map((s) => {
           const Icon = sectorIcon(s.icon);
@@ -184,14 +184,14 @@ export default function HudOverlay({
               type="button"
               aria-pressed={active}
               onClick={() => onSelectSector(s.id)}
-              className={`glass focus-ring group flex w-56 items-center gap-3 rounded-sm px-3 py-2 text-left transition-colors hover:border-accent/50 ${
+              className={`glass focus-ring group flex w-60 items-center gap-3 rounded-sm px-3 py-2 text-left transition-colors hover:border-accent/50 ${
                 active ? 'border-accent/70' : ''
               }`}
             >
               <Icon size={16} aria-hidden className={active ? 'text-accent' : 'text-muted group-hover:text-accent'} />
               <span className="min-w-0">
-                <span className={`block text-[10px] uppercase tracking-[0.22em] ${active ? 'text-accent' : 'text-muted'}`}>{s.name}</span>
-                <span className="block truncate font-sans text-[13px] text-ink">{s.subtitle}</span>
+                <span className={`block text-xs uppercase tracking-[0.16em] ${active ? 'text-accent' : 'text-muted'}`}>{s.name}</span>
+                <span className="block truncate font-sans text-sm text-ink">{s.subtitle}</span>
               </span>
             </button>
           );
@@ -200,8 +200,9 @@ export default function HudOverlay({
 
       {/* Landscape icon rail */}
       <nav
+        data-occluder
         aria-label="Sectors"
-        className="pointer-events-auto absolute bottom-2 left-0 top-12 hidden flex-col justify-center gap-1.5 pl-[max(0.5rem,env(safe-area-inset-left))] land:flex"
+        className="pointer-events-auto absolute bottom-2 left-0 top-14 hidden flex-col justify-center gap-1.5 pl-[max(0.5rem,env(safe-area-inset-left))] land:flex"
       >
         {sectors.map((s) => {
           const Icon = sectorIcon(s.icon);
@@ -226,6 +227,7 @@ export default function HudOverlay({
 
       {/* Mobile bottom tab bar (height mirrors CHROME.mobile.tabBar in layout.js) */}
       <nav
+        data-occluder
         aria-label="Sectors"
         className="pointer-events-auto absolute inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-line/15 bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden land:hidden"
       >
@@ -244,8 +246,8 @@ export default function HudOverlay({
               }`}
             >
               {active && <span aria-hidden className="absolute inset-x-4 top-0 h-0.5 rounded-b bg-accent" />}
-              <Icon size={19} aria-hidden />
-              <span className="text-[9px] uppercase tracking-[0.12em]">{s.short}</span>
+              <Icon size={20} aria-hidden />
+              <span className="text-[11px] uppercase tracking-normal">{s.short}</span>
             </button>
           );
         })}
@@ -254,7 +256,7 @@ export default function HudOverlay({
       {showReticle && <Reticle slewing={slewing} />}
 
       {/* Desktop footer telemetry */}
-      <footer className="pointer-events-auto absolute inset-x-0 bottom-0 hidden border-t border-line/10 bg-gradient-to-t from-bg/90 to-bg/40 px-4 py-2.5 lg:block">
+      <footer data-occluder className="pointer-events-auto absolute inset-x-0 bottom-0 hidden border-t border-line/10 bg-gradient-to-t from-bg/90 to-bg/40 px-4 py-2.5 lg:block">
         <div className="flex items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <Telemetry label="Cursor RA" value={formatRA(ra)} className="w-28" />

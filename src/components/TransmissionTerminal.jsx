@@ -35,7 +35,7 @@ export default function TransmissionTerminal({ profile, highlighted }) {
 
   const field =
     // 16px text below desktop: iOS Safari zooms the page when focusing inputs smaller than that.
-    'w-full rounded-sm border border-line/20 bg-bg/70 px-2.5 py-2 font-mono text-base text-ink lg:text-[13px] placeholder:text-muted/60 focus:border-accent/70 focus:outline-none';
+    'w-full rounded-sm border border-line/20 bg-bg/70 px-2.5 py-2 font-mono text-base text-ink lg:text-sm placeholder:text-muted/60 focus:border-accent/70 focus:outline-none';
 
   return (
     <section
@@ -44,16 +44,16 @@ export default function TransmissionTerminal({ profile, highlighted }) {
       className={`glass reticle rounded-sm p-4 transition-colors ${highlighted ? 'border-accent/70' : ''}`}
     >
       <div className="flex items-center justify-between">
-        <h3 id="comms-title" className="font-mono text-xs uppercase tracking-[0.25em] text-accent">
+        <h3 id="comms-title" className="font-mono text-[13px] uppercase tracking-[0.18em] text-accent">
           Transmission Terminal
         </h3>
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
+        <span className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-muted">
           <span className="h-1.5 w-1.5 animate-blink rounded-full bg-accent" /> Link ready
         </span>
       </div>
 
       <StarChip itemId="comms" className="mt-1" />
-      <pre className="mt-3 overflow-hidden whitespace-pre-wrap rounded-sm bg-bg/80 p-2.5 font-mono text-[11px] leading-relaxed text-accent/80" aria-live="polite">
+      <pre className="mt-3 overflow-hidden whitespace-pre-wrap rounded-sm bg-bg/80 p-2.5 font-mono text-[13px] leading-relaxed text-accent/80" aria-live="polite">
         {log.join('\n')}
       </pre>
 

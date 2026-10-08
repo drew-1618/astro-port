@@ -23,7 +23,7 @@ export default function ExperienceSection({ experience, highlightId, onOpen }) {
               highlightId === x.id ? 'border-accent/70' : ''
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.2em]">
+            <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs uppercase tracking-[0.14em]">
               <span className="text-accent">{x.missionId}</span>
               <span className="text-muted">
                 {x.start} — {x.end}
@@ -31,16 +31,16 @@ export default function ExperienceSection({ experience, highlightId, onOpen }) {
             </div>
             <StarChip itemId={x.id} className="mt-1" />
             <h3 className="mt-1.5 text-base font-semibold leading-snug text-ink">{x.role}</h3>
-            <p className="mt-0.5 flex items-center gap-1 text-sm text-ink/70">
+            <p className="mt-0.5 flex items-center gap-1 text-[15px] text-ink/70">
               {x.org}
               <span className="text-muted">·</span>
               <MapPin size={12} aria-hidden className="text-muted" />
               <span className="text-muted">{x.location}</span>
             </p>
-            <p className="mt-2 text-sm text-ink/80">{x.summary}</p>
+            <p className="mt-2 text-[15px] text-ink/80">{x.summary}</p>
             <ul className="mt-2 space-y-1.5">
               {x.impact.slice(0, 2).map((line) => (
-                <li key={line} className="flex gap-2 text-[13px] leading-relaxed text-ink/75">
+                <li key={line} className="flex gap-2 text-sm leading-relaxed text-ink/75">
                   <span aria-hidden className="mt-2 h-px w-2.5 shrink-0 bg-accent" />
                   {line}
                 </li>
@@ -51,7 +51,7 @@ export default function ExperienceSection({ experience, highlightId, onOpen }) {
                 <SpectralBadge key={t} label={t} size="xs" />
               ))}
             </div>
-            <span className="mt-3 inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted transition-colors group-hover:text-accent">
+            <span className="mt-3 inline-flex items-center gap-1 font-mono text-xs uppercase tracking-[0.14em] text-muted transition-colors group-hover:text-accent">
               Full mission log ({x.impact.length} entries) <ArrowUpRight size={12} aria-hidden />
             </span>
           </button>

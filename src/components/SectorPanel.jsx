@@ -59,11 +59,12 @@ export default function SectorPanel({ sector, data, highlightId, collapsed, onCo
 
   return (
     <aside
+      data-occluder
       key={sector.id}
       aria-label={`${sector.name}: ${sector.subtitle}`}
       className={`glass pointer-events-auto fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 flex flex-col overflow-hidden rounded-t-xl border-b-0 transition-[max-height] duration-300 ease-out animate-[panelUp_.4s_ease-out] ${
-        collapsed ? 'max-h-[92px]' : 'max-h-[52dvh]'
-      } lg:inset-x-auto lg:bottom-16 lg:right-4 lg:top-20 lg:max-h-none lg:w-[min(540px,42vw)] lg:animate-[panelIn_.5s_ease-out] lg:rounded-sm lg:border-b land:inset-x-auto land:bottom-2 land:right-[max(0.5rem,env(safe-area-inset-right))] land:top-12 land:max-h-none land:w-[min(420px,50vw)] land:animate-[panelIn_.4s_ease-out] land:rounded-md land:border-b`}
+        collapsed ? 'max-h-[100px]' : 'max-h-[52dvh]'
+      } lg:inset-x-auto lg:bottom-16 lg:right-4 lg:top-20 lg:max-h-none lg:w-[min(540px,42vw)] lg:animate-[panelIn_.5s_ease-out] lg:rounded-sm lg:border-b land:inset-x-auto land:bottom-2 land:right-[max(0.5rem,env(safe-area-inset-right))] land:top-14 land:max-h-none land:w-[min(420px,50vw)] land:animate-[panelIn_.4s_ease-out] land:rounded-md land:border-b`}
     >
       <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} className="shrink-0 touch-none lg:touch-auto land:touch-auto">
         <button
@@ -81,7 +82,7 @@ export default function SectorPanel({ sector, data, highlightId, collapsed, onCo
               <Icon size={16} aria-hidden />
             </span>
             <div className="min-w-0">
-              <p className="truncate font-mono text-[10px] uppercase tracking-[0.18em] text-accent sm:tracking-[0.25em]">
+              <p className="truncate font-mono text-xs uppercase tracking-[0.12em] text-accent sm:tracking-[0.18em]">
                 {sector.name} · {skySector.constellation}
                 <span className="hidden sm:inline">
                   {' '}
@@ -89,10 +90,10 @@ export default function SectorPanel({ sector, data, highlightId, collapsed, onCo
                 </span>
               </p>
               <h2 className="truncate text-lg font-semibold text-ink">{sector.subtitle}</h2>
-              <p className="truncate text-xs text-muted">{sector.description}</p>
+              <p className="truncate text-[13px] text-muted">{sector.description}</p>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="hud-btn min-w-[36px] shrink-0 px-2" aria-label="Close sector panel">
+          <button type="button" onClick={onClose} className="hud-btn min-w-[40px] shrink-0 px-2" aria-label="Close sector panel">
             <X size={15} aria-hidden />
           </button>
         </header>

@@ -17,7 +17,7 @@ export default function SkillsSection({ skills, highlightId }) {
         >
           <header className="flex items-end justify-between gap-3">
             <div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">Band {g.band}</span>
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-accent">Band {g.band}</span>
               <h3 id={`skills-${g.id}`} className="text-base font-semibold text-ink">
                 {g.group}
               </h3>

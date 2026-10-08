@@ -110,9 +110,9 @@ function ItemStar({ star, colors, sectorActive, focused, showLabel, onSelect }) 
               hovered ? 'text-accent' : 'text-ink/75'
             }`}
           >
-            <div className="text-[10px] tracking-widest">{itemLabel(star.item)}</div>
+            <div className="text-xs tracking-widest">{itemLabel(star.item)}</div>
             {hovered && (
-              <div className="text-[9px] normal-case tracking-wider text-muted">
+              <div className="text-[11px] normal-case tracking-wider text-muted">
                 {star.deepSky ? star.name : <><span className="uppercase">{star.name}</span> · {star.designation}</>}
               </div>
             )}
@@ -123,9 +123,9 @@ function ItemStar({ star, colors, sectorActive, focused, showLabel, onSelect }) 
   );
 }
 
-const LABEL_CHAR_PX = 7; // 10px JetBrains Mono + tracking-widest
-const LABEL_H_PX = 14;
-const LABEL_RISE_PX = 24; // labels sit above their star (-translate-y-6)
+const LABEL_CHAR_PX = 8.4; // 12px JetBrains Mono + tracking-widest
+const LABEL_H_PX = 16;
+const LABEL_RISE_PX = 26; // labels sit above their star (-translate-y-6 plus line height)
 const LABEL_PAD_PX = 4;
 
 /*
@@ -133,7 +133,8 @@ const LABEL_PAD_PX = 4;
  * each item star to the screen and keep its label only if the label's box
  * doesn't overlap one already placed (brightest stars win, off-screen stars
  * are skipped). Prevents unreadable piles of text where stars sit close
- * together — e.g. the deep-sky targets in Auriga, or any star on a phone.
+ * together (e.g. the deep-sky targets in Auriga, or any star on a phone), and
+ * keeps labels out from under fixed UI marked with `data-occluder`.
  * Hidden labels still appear on hover, and every star stays tappable.
  */
 function useLabelLayout(stars, active) {
@@ -145,7 +146,11 @@ function useLabelLayout(stars, active) {
 
   useFrame(({ camera, size }) => {
     if (!active || tick.current++ % 8) return;
-    const placed = [];
+    // Fixed UI (header, panels, nav, intro card) counts as already-occupied space.
+    const placed = [...document.querySelectorAll('[data-occluder]')].map((el) => {
+      const r = el.getBoundingClientRect();
+      return { l: r.left, r: r.right, t: r.top, b: r.bottom };
+    });
     const ids = [];
     order.forEach((star) => {
       v.set(...star.position).project(camera);
@@ -256,11 +261,11 @@ export default function SectorCluster({ sector, sky, colors, active, anyActive, 
             className="whitespace-nowrap text-center font-mono uppercase [text-shadow:0_0_6px_rgb(var(--bg))] disabled:cursor-default"
           >
             {/* Phones (portrait and landscape) get a shorter label so it doesn't run off the edge or collide. */}
-            <span className={`block text-[10px] tracking-[0.18em] sm:text-[11px] sm:tracking-[0.25em] land:text-[10px] land:tracking-[0.18em] ${active || labelHover ? 'text-accent' : 'text-accent/70'}`}>
+            <span className={`block text-xs tracking-[0.12em] sm:text-[13px] sm:tracking-[0.18em] land:text-xs land:tracking-[0.12em] ${active || labelHover ? 'text-accent' : 'text-accent/70'}`}>
               <span className="hidden sm:inline land:hidden">{sector.name} · </span>
               {sky.constellation}
             </span>
-            <span className="block text-[9px] tracking-[0.16em] text-muted sm:tracking-[0.2em]">
+            <span className="block text-[11px] tracking-[0.1em] text-muted sm:tracking-[0.14em]">
               <span className="sm:hidden land:inline">{sector.short}</span>
               <span className="hidden sm:inline land:hidden">{sector.subtitle}</span>
             </span>

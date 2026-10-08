@@ -105,15 +105,15 @@ body {
   }
 
   .hud-label {
-    @apply font-mono text-[10px] uppercase tracking-[0.2em] text-muted;
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-muted;
   }
 
   .hud-value {
-    @apply font-mono text-xs text-accent tabular-nums;
+    @apply font-mono text-[13px] text-accent tabular-nums;
   }
 
   .hud-btn {
-    @apply inline-flex min-h-[36px] touch-manipulation select-none items-center justify-center gap-2 rounded-sm border border-line/20 bg-bg-2/60 px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-widest text-muted transition-colors;
+    @apply inline-flex min-h-[40px] touch-manipulation select-none items-center justify-center gap-2 rounded-sm border border-line/25 bg-bg-2/60 px-3 py-2 font-mono text-xs uppercase tracking-wider text-ink/75 transition-colors;
   }
   .hud-btn[aria-pressed='true'] {
     @apply border-accent/60 text-accent;

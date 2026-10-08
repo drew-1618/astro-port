@@ -9,7 +9,7 @@ const BANDS = ['bg-accent', 'bg-accent-2', 'bg-warn'];
  */
 export default function SpectralBadge({ label, note, size = 'sm' }) {
   const band = BANDS[hashString(label) % BANDS.length];
-  const pad = size === 'xs' ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-[11px]';
+  const pad = size === 'xs' ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-1 text-[13px]';
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-sm border border-line/15 bg-bg/50 font-mono uppercase tracking-wider text-ink/85 ${pad}`}

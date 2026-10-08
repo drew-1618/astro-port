@@ -35,18 +35,19 @@ function WelcomeCard({ collapsed, onToggle, onBegin, onComms, touch }) {
         onClick={onToggle}
         aria-expanded="false"
         aria-label={`About ${profile.name}`}
+        data-occluder
         className="glass reticle pointer-events-auto fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] left-3 z-20 flex touch-manipulation items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3.5 transition-colors hover:border-accent/50 active:bg-accent/10 lg:bottom-20 lg:left-auto lg:right-6 land:bottom-2 land:left-auto land:right-[max(0.5rem,env(safe-area-inset-right))]"
       >
-        <span className="grid h-8 w-8 place-items-center rounded-full border border-accent/50 font-mono text-[10px] font-bold text-accent">{profile.initials}</span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/80">About</span>
+        <span className="grid h-8 w-8 place-items-center rounded-full border border-accent/50 font-mono text-xs font-bold text-accent">{profile.initials}</span>
+        <span className="font-mono text-xs uppercase tracking-[0.14em] text-ink/80">About</span>
         <ChevronUp size={14} aria-hidden className="text-muted" />
       </button>
     );
   }
   return (
-    <section className="glass reticle pointer-events-auto fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] z-20 rounded-sm p-4 lg:inset-x-auto lg:bottom-20 lg:right-6 lg:w-[400px] land:inset-x-auto land:bottom-2 land:right-[max(0.5rem,env(safe-area-inset-right))] land:w-[min(340px,45vw)] land:p-3">
+    <section data-occluder className="glass reticle pointer-events-auto fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] z-20 rounded-sm p-4 lg:inset-x-auto lg:bottom-20 lg:right-6 lg:w-[400px] land:inset-x-auto land:bottom-2 land:right-[max(0.5rem,env(safe-area-inset-right))] land:w-[min(340px,45vw)] land:p-3">
       <div className="flex items-start justify-between gap-3">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent sm:tracking-[0.25em]">Observatory online · all-sky view</p>
+        <p className="font-mono text-xs uppercase tracking-[0.12em] text-accent sm:tracking-[0.18em]">Observatory online · all-sky view</p>
         <button
           type="button"
           onClick={onToggle}
@@ -58,11 +59,11 @@ function WelcomeCard({ collapsed, onToggle, onBegin, onComms, touch }) {
         </button>
       </div>
       <h1 className="text-lg font-semibold text-ink sm:text-xl land:text-base">{profile.name}</h1>
-      <p className="flex items-center gap-1 font-mono text-[11px] text-muted">
+      <p className="flex items-center gap-1 font-mono text-[13px] text-muted">
         <MapPin size={12} aria-hidden /> {profile.location}
       </p>
-      <p className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-ink/80 sm:line-clamp-none sm:text-sm land:hidden">{profile.summary}</p>
-      <p className="mt-2 text-xs text-muted land:mt-1">
+      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink/80 sm:line-clamp-none sm:text-[15px] land:hidden">{profile.summary}</p>
+      <p className="mt-2 text-[13px] text-muted land:mt-1">
         {touch
           ? 'Tap a sector or any star to inspect it. Drag to look around, pinch to zoom.'
           : 'Pick a sector to slew the mount, or click any star to inspect it. Drag to look around, scroll to zoom.'}

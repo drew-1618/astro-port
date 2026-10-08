@@ -13,15 +13,15 @@ export default function StarChip({ itemId, withCoords = false, className = '' })
   // Solar-system objects move, so their plotted spot isn't a real coordinate; don't show one.
   if (star.solarSystem) {
     return (
-      <span className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted ${className}`}>
+      <span className={`inline-flex flex-wrap items-center gap-x-1.5 font-mono text-xs tracking-wider text-muted ${className}`}>
         <Star size={10} aria-hidden className="text-accent-2" />
-        <span className="uppercase">Solar System</span>
-        {withCoords && <span className="text-muted/80">· plotted on the ecliptic</span>}
+        <span className="whitespace-nowrap uppercase">Solar System</span>
+        {withCoords && <span className="whitespace-nowrap text-muted/80">· plotted on the ecliptic</span>}
       </span>
     );
   }
   return (
-    <span className={`inline-flex flex-wrap items-center gap-x-1.5 font-mono text-[10px] tracking-wider text-muted ${className}`} title={coords}>
+    <span className={`inline-flex flex-wrap items-center gap-x-1.5 font-mono text-xs tracking-wider text-muted ${className}`} title={coords}>
       <Star size={10} aria-hidden className="text-accent-2" />
       {/* Only the name is uppercased: CSS uppercase would turn Greek Bayer letters (α, β, γ) into Latin lookalikes. */}
       <span className="uppercase">{star.deepSky ? star.constellation : star.name}</span>

@@ -24,7 +24,7 @@ export default function Ecliptic({ colors }) {
     <group>
       <Line points={points} color={colors['accent-2']} lineWidth={1} dashed dashSize={3} gapSize={4} transparent opacity={0.22} depthWrite={false} />
       <Html position={labelAt} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
-        <span className="whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.3em] text-accent-2/60">Ecliptic</span>
+        <span className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2/60">Ecliptic</span>
       </Html>
     </group>
   );

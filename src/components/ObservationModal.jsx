@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, Github, X } from 'lucide-react';
 import SpectralBadge from './ui/SpectralBadge';
-import AstroMedia from './ui/AstroMedia';
+import AstroMedia, { assetUrl } from './ui/AstroMedia';
 import StarChip from './ui/StarChip';
 
 const KIND_META = {
@@ -13,7 +13,7 @@ const KIND_META = {
 function Section({ title, children }) {
   return (
     <section className="mt-5">
-      <h4 className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-accent">{title}</h4>
+      <h4 className="mb-2 font-mono text-xs uppercase tracking-[0.18em] text-accent">{title}</h4>
       {children}
     </section>
   );
@@ -23,7 +23,7 @@ function Bullets({ items }) {
   return (
     <ul className="space-y-2">
       {items.map((line) => (
-        <li key={line} className="flex gap-2.5 text-sm leading-relaxed text-ink/85">
+        <li key={line} className="flex gap-2.5 text-[15px] leading-relaxed text-ink/85">
           <span aria-hidden className="mt-2.5 h-px w-3 shrink-0 bg-accent" />
           {line}
         </li>
@@ -42,7 +42,7 @@ function MetaGrid({ rows }) {
       {visible.map(([k, v]) => (
         <div key={k} className="flex justify-between gap-3 border-b border-line/10 pb-1">
           <dt className="hud-label shrink-0">{k}</dt>
-          <dd className="text-right font-mono text-xs text-ink/90">{v}</dd>
+          <dd className="text-right font-mono text-[13px] text-ink/90">{v}</dd>
         </div>
       ))}
     </dl>
@@ -52,25 +52,25 @@ function MetaGrid({ rows }) {
 function ProjectBody({ item }) {
   return (
     <>
-      <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted">
         {item.context} · {item.timeline.start}
         {item.timeline.end && item.timeline.end !== item.timeline.start ? ` → ${item.timeline.end}` : ''}
       </p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {item.classification.map((c) => (
-          <span key={c} className="rounded-sm border border-accent/30 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-accent">
+          <span key={c} className="rounded-sm border border-accent/30 px-1.5 py-0.5 font-mono text-xs uppercase tracking-widest text-accent">
             {c}
           </span>
         ))}
       </div>
-      <p className="mt-4 text-[15px] leading-relaxed text-ink/90">{item.description}</p>
+      <p className="mt-4 text-base leading-relaxed text-ink/90">{item.description}</p>
       {item.metrics?.length > 0 && (
         <Section title="Telemetry">
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
             {item.metrics.map((m) => (
               <div key={m.label} className="rounded-sm border border-line/15 bg-bg/50 p-2.5">
                 <div className="hud-label">{m.label}</div>
-                <div className="mt-1 font-mono text-sm text-accent">{m.value}</div>
+                <div className="mt-1 font-mono text-[15px] text-accent">{m.value}</div>
               </div>
             ))}
           </div>
@@ -107,13 +107,13 @@ function ProjectBody({ item }) {
 function RoleBody({ item }) {
   return (
     <>
-      <p className="text-sm text-ink/80">
+      <p className="text-[15px] text-ink/80">
         {item.org} · {item.location}
       </p>
-      <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted">
         {item.start} — {item.end}
       </p>
-      <p className="mt-4 text-[15px] leading-relaxed text-ink/90">{item.summary}</p>
+      <p className="mt-4 text-base leading-relaxed text-ink/90">{item.summary}</p>
       <Section title="Impact & responsibilities">
         <Bullets items={item.impact} />
       </Section>
@@ -151,10 +151,10 @@ function PhotoBody({ item }) {
       ) : (
         <AstroMedia photo={item} eager className="-mx-4 mt-1 aspect-[4/3] sm:-mx-6 land:mx-auto land:h-[55dvh] land:w-auto" />
       )}
-      <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted">
+      <p className="mt-3 font-mono text-xs uppercase tracking-widest text-muted">
         {[item.type, item.date, item.location].filter(Boolean).join(' · ')}
       </p>
-      {item.notes && <p className="mt-3 text-[15px] leading-relaxed text-ink/90">{item.notes}</p>}
+      {item.notes && <p className="mt-3 text-base leading-relaxed text-ink/90">{item.notes}</p>}
       {opticsRows.some(known) && (
         <Section title="Optical train">
           <MetaGrid rows={opticsRows} />
@@ -223,6 +223,14 @@ export default function ObservationModal({ kind, item, items, onClose, onNavigat
     return () => window.removeEventListener('keydown', onKey);
   }, [index, items, onClose, onNavigate]);
 
+  // Preload the neighbouring full-size photos so flipping through the gallery is instant.
+  useEffect(() => {
+    if (items.length < 2) return;
+    [items[(index + 1) % items.length], items[(index - 1 + items.length) % items.length]].forEach((n) => {
+      if (n?.image) new Image().src = assetUrl(n.image);
+    });
+  }, [index, items]);
+
   useEffect(() => {
     dialogRef.current?.querySelector('[data-scroll]')?.scrollTo({ top: 0 });
   }, [item]);
@@ -252,15 +260,17 @@ export default function ObservationModal({ kind, item, items, onClose, onNavigat
         role="dialog"
         aria-modal="true"
         aria-labelledby="obs-title"
-        className="glass reticle relative flex max-h-[92dvh] w-full max-w-3xl animate-[panelUp_.3s_ease-out] flex-col rounded-t-xl sm:rounded-sm land:max-h-full"
+        // Fixed height (not content height) so the header and the Prev / Next footer stay in
+        // exactly the same place while stepping through entries.
+        className="glass reticle relative flex h-[92dvh] w-full max-w-3xl animate-[panelUp_.3s_ease-out] flex-col rounded-t-xl sm:h-[min(900px,92dvh)] sm:rounded-sm land:h-full"
       >
         <span aria-hidden className="mx-auto mt-2 h-1 w-10 rounded-full bg-muted/40 sm:hidden" />
         <header className="flex items-start justify-between gap-4 border-b border-line/15 px-4 py-3 sm:px-6 sm:py-4 land:py-2">
           <div className="min-w-0">
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent">
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
               {meta.header} · {item[meta.idKey]}
             </p>
-            <h2 id="obs-title" className="mt-1 text-xl font-semibold leading-tight text-ink sm:text-2xl">
+            <h2 id="obs-title" className="mt-1 text-xl font-semibold truncate leading-tight text-ink sm:text-2xl">
               {title}
             </h2>
             <StarChip itemId={item.id} withCoords className="mt-1" />
@@ -274,7 +284,7 @@ export default function ObservationModal({ kind, item, items, onClose, onNavigat
           data-scroll
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
-          className="scrollbar-thin min-h-0 overflow-y-auto overscroll-contain px-4 pb-6 pt-4 sm:px-6"
+          className="scrollbar-thin min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6 pt-4 sm:px-6"
         >
           <Body item={item} />
         </div>
@@ -288,7 +298,7 @@ export default function ObservationModal({ kind, item, items, onClose, onNavigat
             >
               <ChevronLeft size={13} aria-hidden /> Prev
             </button>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            <span className="font-mono text-xs uppercase tracking-widest text-muted">
               {index + 1} / {items.length}
               <span className="ml-2 sm:hidden">· swipe</span>
             </span>

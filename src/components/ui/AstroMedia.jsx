@@ -4,7 +4,7 @@ import PlaceholderAstro from './PlaceholderAstro';
  * Data paths like '/astro/m42.jpg' point into /public. Prefix them with the
  * deploy base ('/astro-port/' on GitHub Pages) so they resolve in production.
  */
-function assetUrl(path) {
+export function assetUrl(path) {
   if (/^(https?:|data:|blob:)/.test(path)) return path;
   return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
 }

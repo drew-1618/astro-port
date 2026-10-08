@@ -15,9 +15,9 @@ export const LANDSCAPE_QUERY = '(orientation: landscape) and (max-height: 540px)
  * They mirror the Tailwind classes in HudOverlay / SectorPanel / WelcomeCard.
  */
 const CHROME = {
-  desktop: { header: 72, footer: 52, dock: 256, panel: (w) => Math.min(540, w * 0.42) + 24 },
-  mobile: { header: 100, tabBar: 56, sheet: (h) => h * 0.52 + 8, sheetCollapsed: 92, welcome: 268, welcomePill: 76 },
-  landscape: { header: 48, rail: 60, panel: (w) => Math.min(420, w * 0.5) + 16, welcome: (w) => Math.min(340, w * 0.45) + 16 },
+  desktop: { header: 76, footer: 58, dock: 272, panel: (w) => Math.min(540, w * 0.42) + 24 },
+  mobile: { header: 100, tabBar: 58, sheet: (h) => h * 0.52 + 8, sheetCollapsed: 100, welcome: 268, welcomePill: 76 },
+  landscape: { header: 56, rail: 60, panel: (w) => Math.min(420, w * 0.5) + 16, welcome: (w) => Math.min(340, w * 0.45) + 16 },
 };
 
 export function useMediaQuery(query) {
