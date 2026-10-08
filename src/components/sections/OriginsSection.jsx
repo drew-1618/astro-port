@@ -1,16 +1,19 @@
-import { Award, GraduationCap, Plane } from 'lucide-react';
+import { Award, Crosshair, GraduationCap, Plane } from 'lucide-react';
 import TransmissionTerminal from '../TransmissionTerminal';
 import StarChip from '../ui/StarChip';
+import { locatable } from '../ui/locatable';
 
 /* Sector Epsilon: academic history followed by the comms terminal. */
-export default function OriginsSection({ education, profile, highlightId }) {
+export default function OriginsSection({ education, profile, highlightId, onLocate }) {
   return (
     <div className="grid gap-4">
       {education.map((e) => (
         <article
           key={e.id}
           id={`item-${e.id}`}
-          className={`glass reticle rounded-sm p-4 transition-colors ${highlightId === e.id ? 'border-accent/70' : ''}`}
+          className={`glass reticle focus-ring group cursor-pointer rounded-sm p-4 transition-colors hover:border-accent/50 ${highlightId === e.id ? 'border-accent/70' : ''}`}
+        
+          {...locatable(e.id, onLocate)}
         >
           <div className="flex items-center justify-between gap-2 font-mono text-xs uppercase tracking-[0.14em]">
             <span className="flex items-center gap-1.5 text-accent">
@@ -52,6 +55,9 @@ export default function OriginsSection({ education, profile, highlightId }) {
               ))}
             </ul>
           )}
+          <span className="mt-3 inline-flex items-center gap-1 font-mono text-xs uppercase tracking-[0.14em] text-muted transition-colors group-hover:text-accent">
+            <Crosshair size={12} aria-hidden /> Locate in sky
+          </span>
         </article>
       ))}
       <TransmissionTerminal profile={profile} highlighted={highlightId === 'comms'} />

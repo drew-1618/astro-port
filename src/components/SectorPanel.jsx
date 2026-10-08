@@ -17,7 +17,7 @@ import GallerySection from './GallerySection';
  *   up to expand. Heights mirror CHROME.mobile in src/lib/layout.js.
  * When `highlightId` changes (a star was tapped) the matching entry scrolls into view.
  */
-export default function SectorPanel({ sector, data, highlightId, collapsed, onCollapsedChange, onOpen, onClose }) {
+export default function SectorPanel({ sector, data, highlightId, collapsed, onCollapsedChange, onOpen, onLocate, onClose }) {
   const scrollRef = useRef(null);
   const touchStart = useRef(null);
   const Icon = sectorIcon(sector.icon);
@@ -52,9 +52,9 @@ export default function SectorPanel({ sector, data, highlightId, collapsed, onCo
   const content = {
     projects: <ProjectsSection projects={data.projects} highlightId={highlightId} onOpen={onOpen} />,
     experience: <ExperienceSection experience={data.experience} highlightId={highlightId} onOpen={onOpen} />,
-    skills: <SkillsSection skills={data.skills} highlightId={highlightId} />,
+    skills: <SkillsSection skills={data.skills} highlightId={highlightId} onLocate={onLocate} />,
     astrophotos: <GallerySection photos={data.astrophotos} highlightId={highlightId} onOpen={onOpen} />,
-    education: <OriginsSection education={data.education} profile={data.profile} highlightId={highlightId} />,
+    education: <OriginsSection education={data.education} profile={data.profile} highlightId={highlightId} onLocate={onLocate} />,
   }[sector.key];
 
   return (

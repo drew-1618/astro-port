@@ -212,6 +212,21 @@ export function buildSky(sectors, catalog, itemsFor, contextNames = []) {
     });
 
   sky.allPoints = Object.values(sky.sectors).flatMap((sec) => sec.points);
+
+  // Every drawn constellation as a list of star directions, for "what am I looking at?" lookups.
+  sky.fields = [
+    ...sectors.map((sector) => {
+      const sec = sky.sectors[sector.id];
+      return {
+        name: sec.constellation,
+        dirs: [...sec.stars.filter((st) => !st.deepSky), ...sec.background].map((st) => raDecToDirection(st.ra, st.dec)),
+      };
+    }),
+    ...sky.context.map((con) => ({
+      name: con.name,
+      dirs: con.background.map((st) => raDecToDirection(st.ra, st.dec)),
+    })),
+  ];
   return sky;
 }
 
@@ -286,6 +301,35 @@ export function sectorPose(skySector, view = {}) {
  */
 export function itemPose(starPosition, view = {}) {
   return framePose({ center: starPosition, minExtent: 9, fov: 30, margin: 1, minDistance: 220, ...view });
+}
+
+/*
+ * Which constellation is at the centre of the view: the one with a star
+ * closest to the view direction, if within `maxDeg`. Returns its name or null.
+ */
+const _view = new THREE.Vector3();
+export function constellationInView(camera, fields, maxDeg = 22) {
+  camera.getWorldDirection(_view);
+  let best = null;
+  let bestAngle = THREE.MathUtils.degToRad(maxDeg);
+  fields.forEach((f) =>
+    f.dirs.forEach((d) => {
+      const a = _view.angleTo(d);
+      if (a < bestAngle) {
+        bestAngle = a;
+        best = f.name;
+      }
+    }),
+  );
+  return best;
+}
+
+/* Angle (degrees) between the view direction and the direction from the camera to `point`. */
+const _toPoint = new THREE.Vector3();
+export function angleToPoint(camera, point) {
+  camera.getWorldDirection(_view);
+  _toPoint.set(...point).sub(camera.position);
+  return THREE.MathUtils.radToDeg(_view.angleTo(_toPoint));
 }
 
 /* ── Sky coordinates ──────────────────────────────────────────────────────── */

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Eye, LocateFixed, Moon, Volume2, VolumeX } from 'lucide-react';
-import { formatDec, formatRA, localSiderealTime, ndcToRaDec } from '../lib/celestial';
+import { angleToPoint, constellationInView, formatDec, formatRA, localSiderealTime, ndcToRaDec } from '../lib/celestial';
 import { sectorIcon } from './ui/icons';
 import Telemetry from './ui/Telemetry';
 
@@ -41,6 +41,33 @@ function useCursorRaDec(cameraRef) {
   }, [cameraRef]);
 
   return coords;
+}
+
+/*
+ * What the view is pointed at, re-checked ~4×/s so it follows dragging and
+ * zooming. While a target is selected and still near the centre of the view
+ * it's reported as is; otherwise the constellation at the centre is named.
+ */
+function useViewLabel(cameraRef, fields, targetLabel, targetPoint) {
+  const [label, setLabel] = useState(targetLabel || 'ALL-SKY');
+  useEffect(() => {
+    const check = () => {
+      const camera = cameraRef.current;
+      if (!camera) return;
+      const onTarget = targetLabel && targetPoint && angleToPoint(camera, targetPoint) < Math.max(8, camera.fov * 0.3);
+      if (onTarget) {
+        setLabel(targetLabel);
+        return;
+      }
+      const name = constellationInView(camera, fields, Math.max(12, camera.fov * 0.35));
+      const { ra, dec } = ndcToRaDec(0, 0, camera);
+      setLabel(name ? `FIELD · ${name.toUpperCase()}` : `OPEN SKY · ${formatRA(ra).slice(0, 7)} ${formatDec(dec).slice(0, 4)}`);
+    };
+    check();
+    const id = setInterval(check, 250);
+    return () => clearInterval(id);
+  }, [cameraRef, fields, targetLabel, targetPoint]);
+  return label;
 }
 
 function useClock() {
@@ -84,6 +111,8 @@ export default function HudOverlay({
   sectors,
   activeSectorId,
   targetLabel,
+  targetPoint,
+  fields,
   slewing,
   redMode,
   audioOn,
@@ -102,7 +131,10 @@ export default function HudOverlay({
   const fov = fovDeg < 10 ? fovDeg.toFixed(1) : Math.round(fovDeg);
   const activeSector = sectors.find((s) => s.id === activeSectorId);
 
-  const status = slewing ? `SLEWING → ${targetLabel}` : activeSector ? 'TRACKING: SIDEREAL' : 'PARKED · ALL-SKY';
+  const viewLabel = useViewLabel(cameraRef, fields, targetLabel, targetPoint);
+  const status = slewing ? `SLEWING → ${targetLabel || 'ALL-SKY'}` : activeSector ? 'TRACKING: SIDEREAL' : 'PARKED';
+  // Phones have no Target readout, so their status line names what's in view.
+  const mobileStatus = slewing ? status : `${activeSector ? 'TRACKING' : 'PARKED'} · ${viewLabel.replace(/^FIELD · /, '')}`;
   const site = `${profile.site.name} · ${Math.abs(profile.site.lat).toFixed(2)}°${profile.site.lat >= 0 ? 'N' : 'S'} ${Math.abs(profile.site.lon).toFixed(2)}°${profile.site.lon >= 0 ? 'E' : 'W'}`;
 
   const toggles = (
@@ -152,17 +184,17 @@ export default function HudOverlay({
               <StatusDot slewing={slewing} />
               <span className="truncate">{status}</span>
             </span>
-            <Telemetry label="Target" value={targetLabel} className="hidden max-w-[260px] xl:flex" />
+            <Telemetry label={viewLabel === targetLabel ? 'Target' : 'In view'} value={viewLabel} className="max-w-[220px] xl:max-w-[280px]" />
           </div>
 
           {toggles}
         </div>
 
-        {/* Mobile second row: status + live sky coordinates */}
-        <div className="mt-1.5 flex items-center justify-between gap-3 text-xs uppercase tracking-[0.12em] lg:hidden land:hidden" aria-live="polite">
+        {/* Mobile second row: status + live sky coordinates (labels arrive pre-cased so Greek star letters survive) */}
+        <div className="mt-1.5 flex items-center justify-between gap-3 text-xs tracking-[0.12em] lg:hidden land:hidden" aria-live="polite">
           <span className="flex min-w-0 items-center gap-1.5 text-accent">
             <StatusDot slewing={slewing} />
-            <span className="truncate">{status}</span>
+            <span className="truncate">{mobileStatus}</span>
           </span>
           <span className="shrink-0 text-[11px] tabular-nums text-muted sm:text-xs">
             {formatRA(ra).slice(0, 7)} <span className="text-muted/60">·</span> {formatDec(dec).slice(0, 8)}

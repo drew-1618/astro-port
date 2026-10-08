@@ -207,6 +207,7 @@ export function BackgroundStar({ star, colors }) {
 export default function SectorCluster({ sector, sky, colors, active, anyActive, focusedItemId, onSelectSector, onSelectItem }) {
   const lineRef = useRef();
   const [labelHover, setLabelHover] = useState(false);
+  const labelDown = useRef(null);
   const segments = useMemo(() => sky.lines.flat(), [sky.lines]);
   const labels = useLabelLayout(sky.stars, active);
 
@@ -254,8 +255,17 @@ export default function SectorCluster({ sector, sky, colors, active, anyActive, 
         <Html position={sky.labelPosition} center zIndexRange={[15, 0]}>
           <button
             type="button"
+            data-sky-drag
             disabled={active}
-            onClick={() => onSelectSector(sector.id)}
+            onPointerDown={(e) => {
+              labelDown.current = { x: e.clientX, y: e.clientY };
+            }}
+            onClick={(e) => {
+              // A drag that began on the label pans the sky (see CameraRig); only a real click selects.
+              const d = labelDown.current;
+              if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6) return;
+              onSelectSector(sector.id);
+            }}
             onPointerEnter={() => setLabelHover(true)}
             onPointerLeave={() => setLabelHover(false)}
             className="whitespace-nowrap text-center font-mono uppercase [text-shadow:0_0_6px_rgb(var(--bg))] disabled:cursor-default"

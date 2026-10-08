@@ -126,6 +126,8 @@ export default function CameraRig({ pose, reducedMotion, onSlewChange, cameraRef
 
     const onPointerDown = (e) => {
       if (slewing.current) return;
+      // Drags start on the sky itself or on in-sky labels marked data-sky-drag.
+      if (e.target !== el && !e.target.closest?.('[data-sky-drag]')) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       velocity.current = { az: 0, el: 0 };
       if (pointers.size === 2) {
@@ -188,14 +190,14 @@ export default function CameraRig({ pose, reducedMotion, onSlewChange, cameraRef
 
     const onContextMenu = (e) => e.preventDefault();
 
-    el.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
     el.addEventListener('wheel', onWheel, { passive: false });
     el.addEventListener('contextmenu', onContextMenu);
     return () => {
-      el.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);

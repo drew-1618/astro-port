@@ -102,6 +102,17 @@ export default function App() {
   const [slewing, setSlewing] = useState(false);
   // Bumped on every navigation request so the camera re-slews even after the user has dragged away.
   const [slewRequest, setSlewRequest] = useState(0);
+  /*
+   * Where the mount is pointed: { type: 'home' } | { type: 'sector', sectorId } |
+   * { type: 'item', sectorId, itemId }. Only explicit navigation (sectors, stars,
+   * cards, Recenter) changes it. Closing panels / detail views leaves it alone,
+   * so the camera stays put and the visitor can keep looking around from there.
+   */
+  const [aim, setAim] = useState({ type: 'home' });
+  const goTo = useCallback((next) => {
+    setAim(next);
+    setSlewRequest((n) => n + 1);
+  }, []);
   const cameraRef = useRef(null);
   const audio = useAmbientAudio();
   const { blip } = audio;
@@ -132,31 +143,37 @@ export default function App() {
 
   const activeSector = sectors.find((s) => s.id === activeSectorId) || null;
 
-  // Camera framing accounts for the screen shape and whatever UI currently covers it.
+  // Read at slew time only: resizing, rotating or folding the sheet never yanks the camera.
+  const frameRef = useRef();
+  frameRef.current = { layout, viewport, sheetCollapsed };
+
+  // A new pose (and so a slew) is computed only when navigation bumps slewRequest.
   const pose = useMemo(() => {
+    const { layout: lay, viewport: vp, sheetCollapsed: sheet } = frameRef.current;
+    const home = aim.type === 'home';
     const view = {
-      aspect: viewport.w / viewport.h,
-      insets: viewportInsets(layout, viewport, {
-        panelOpen: Boolean(activeSector),
-        sheetCollapsed,
-        welcome: activeSector ? 'hidden' : welcomeCollapsedRef.current ? 'collapsed' : 'open',
+      aspect: vp.w / vp.h,
+      insets: viewportInsets(lay, vp, {
+        panelOpen: !home, // navigating to a sector or star opens its panel
+        sheetCollapsed: !home && sheet,
+        welcome: home ? (welcomeCollapsedRef.current ? 'collapsed' : 'open') : 'hidden',
       }),
     };
-    const star = focused && sky.byItem[focused.itemId];
+    const star = aim.type === 'item' && sky.byItem[aim.itemId];
     if (star) return itemPose(star.position, view);
-    if (activeSector) return sectorPose(sky.sectors[activeSector.id], view);
+    if (aim.type !== 'home') return sectorPose(sky.sectors[aim.sectorId], view);
     return homePose(sky, view);
-    // slewRequest forces a fresh pose object (and so a slew) even when nothing else changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focused, activeSector, layout, viewport, sheetCollapsed, sky, slewRequest]);
+  }, [sky, slewRequest]);
 
   const targetLabel = useMemo(() => {
-    const star = focused && sky.byItem[focused.itemId];
+    const star = aim.type === 'item' && sky.byItem[aim.itemId];
     if (star) return `${itemLabel(star.item).toUpperCase()} · ${star.deepSky ? star.name.toUpperCase() : star.designation}`;
-    return activeSector
-      ? `${activeSector.name} · ${sky.sectors[activeSector.id].constellation}`.toUpperCase()
-      : 'ALL-SKY · WINTER HEXAGON';
-  }, [focused, activeSector, sky]);
+    const sector = aim.type === 'sector' && sectors.find((s) => s.id === aim.sectorId);
+    return sector
+      ? `${sector.name} · ${sky.sectors[sector.id].constellation}`.toUpperCase()
+      : null; // nothing selected: the HUD names whatever constellation is in view
+  }, [aim, sky]);
 
   const selectSector = useCallback(
     (id) => {
@@ -165,10 +182,10 @@ export default function App() {
       setModal(null);
       setHighlightId(null);
       setSheetCollapsed(false);
-      setSlewRequest((n) => n + 1);
+      goTo({ type: 'sector', sectorId: id });
       blip();
     },
-    [blip],
+    [blip, goTo],
   );
 
   const selectItem = useCallback(
@@ -179,31 +196,55 @@ export default function App() {
       setHighlightId(itemId);
       const isContentItem = (collections[sector.key] || []).some((i) => i.id === itemId);
       setModal(sector.modalKind && isContentItem ? { kind: sector.modalKind, sectorId, itemId } : null);
-      setSlewRequest((n) => n + 1);
+      goTo({ type: 'item', sectorId, itemId });
       blip();
     },
-    [blip],
+    [blip, goTo],
   );
 
-  const openFromPanel = useCallback((kind, item) => {
-    const sector = sectors.find((s) => s.modalKind === kind);
-    setFocused({ sectorId: sector.id, itemId: item.id });
-    setHighlightId(item.id);
-    setModal({ kind, sectorId: sector.id, itemId: item.id });
-    setSlewRequest((n) => n + 1);
-  }, []);
+  const openFromPanel = useCallback(
+    (kind, item) => {
+      const sector = sectors.find((s) => s.modalKind === kind);
+      setFocused({ sectorId: sector.id, itemId: item.id });
+      setHighlightId(item.id);
+      setModal({ kind, sectorId: sector.id, itemId: item.id });
+      goTo({ type: 'item', sectorId: sector.id, itemId: item.id });
+    },
+    [goTo],
+  );
 
-  const closeModal = useCallback(() => {
-    setModal(null);
+  // Cards without a detail view (skill groups, schools, comms): just slew to their star.
+  const locateFromPanel = useCallback(
+    (itemId) => {
+      if (!activeSectorId) return;
+      setFocused({ sectorId: activeSectorId, itemId });
+      setHighlightId(itemId);
+      goTo({ type: 'item', sectorId: activeSectorId, itemId });
+      blip();
+    },
+    [activeSectorId, blip, goTo],
+  );
+
+  // Closing a detail view keeps the camera where it is.
+  const closeModal = useCallback(() => setModal(null), []);
+
+  const navigateModal = useCallback(
+    (item) => {
+      setModal((m) => (m ? { ...m, itemId: item.id } : m));
+      setFocused((f) => (f ? { ...f, itemId: item.id } : f));
+      setHighlightId(item.id);
+      setAim((a) => (a.type === 'item' ? { ...a, itemId: item.id } : a));
+      setSlewRequest((n) => n + 1);
+    },
+    [],
+  );
+
+  // Closing the sector panel also leaves the camera where it is; only Recenter goes home.
+  const closePanel = useCallback(() => {
+    setActiveSectorId(null);
     setFocused(null);
-    setSlewRequest((n) => n + 1);
-  }, []);
-
-  const navigateModal = useCallback((item) => {
-    setModal((m) => (m ? { ...m, itemId: item.id } : m));
-    setFocused((f) => (f ? { ...f, itemId: item.id } : f));
-    setHighlightId(item.id);
-    setSlewRequest((n) => n + 1);
+    setModal(null);
+    setHighlightId(null);
   }, []);
 
   const toggleWelcome = useCallback(() => {
@@ -218,20 +259,17 @@ export default function App() {
   }, []);
 
   const recenter = useCallback(() => {
-    setActiveSectorId(null);
-    setFocused(null);
-    setModal(null);
-    setHighlightId(null);
-    setSlewRequest((n) => n + 1);
-  }, []);
+    closePanel();
+    goTo({ type: 'home' });
+  }, [closePanel, goTo]);
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape' && !modal && activeSectorId) recenter();
+      if (e.key === 'Escape' && !modal && activeSectorId) closePanel();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [modal, activeSectorId, recenter]);
+  }, [modal, activeSectorId, closePanel]);
 
   const modalSector = modal && sectors.find((s) => s.id === modal.sectorId);
   const modalItems = modalSector ? collections[modalSector.key] : [];
@@ -259,6 +297,8 @@ export default function App() {
         sectors={sectors}
         activeSectorId={activeSectorId}
         targetLabel={targetLabel}
+        targetPoint={pose.target}
+        fields={sky.fields}
         slewing={slewing}
         redMode={theme === 'red'}
         audioOn={audio.enabled}
@@ -288,7 +328,8 @@ export default function App() {
           collapsed={layout === 'mobile' && sheetCollapsed}
           onCollapsedChange={setSheetCollapsed}
           onOpen={openFromPanel}
-          onClose={recenter}
+          onLocate={locateFromPanel}
+          onClose={closePanel}
         />
       )}
 
