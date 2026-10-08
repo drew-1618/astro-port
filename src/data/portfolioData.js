@@ -398,7 +398,6 @@ const NEXSTAR_PROJECTION = {
   mount: 'NexStar SLT GoTo alt-az',
   camera: 'Nikon D3200',
 };
-const UNKNOWN_OPTICS = { telescope: null, focalLength: null, mount: null, camera: null };
 const NO_INTEGRATION = { subs: null, subExposure: null, isoGain: null, totalTime: null, filters: null, barlow: null };
 
 export const astrophotos = [
@@ -440,7 +439,7 @@ export const astrophotos = [
     coords: { ra: hms(5, 38), dec: dms(-3, 30), constellation: 'Orion' },
     image: '/astro/orion-belt-sword.jpg',
     thumb: '/astro/thumbs/orion-belt-sword.jpg',
-    optics: UNKNOWN_OPTICS,
+    optics: D3200,
     integration: NO_INTEGRATION,
     processing: ['Snapseed'],
     date: null,
@@ -455,7 +454,7 @@ export const astrophotos = [
     coords: { ra: hms(3, 47, 24), dec: dms(24, 7), constellation: 'Taurus' },
     image: '/astro/m45-pleiades.jpg',
     thumb: '/astro/thumbs/m45-pleiades.jpg',
-    optics: UNKNOWN_OPTICS,
+    optics: D3200,
     integration: NO_INTEGRATION,
     processing: ['Snapseed'],
     date: null,
@@ -490,7 +489,7 @@ export const astrophotos = [
     processing: ['Snapseed'],
     date: null,
     location: null,
-    notes: 'A dense ball of a few hundred thousand old stars about 22,000 light years away. It sits in the summer sky, far from the winter constellations, so drag around to find its star.',
+    notes: 'A dense ball of a few hundred thousand old stars about 22,000 light years away, on the western edge of the Keystone in Hercules. It sits in the summer sky, far from the winter constellations: drag around to find it.',
   },
   {
     id: 'eclipse-2024-totality',
@@ -575,7 +574,7 @@ export const astrophotos = [
     solarSystem: true,
     image: '/astro/moon-first-quarter.jpg',
     thumb: '/astro/thumbs/moon-first-quarter.jpg',
-    optics: UNKNOWN_OPTICS,
+    optics: D3200,
     integration: NO_INTEGRATION,
     processing: ['Snapseed'],
     date: null,

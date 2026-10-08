@@ -145,4 +145,38 @@ export const constellations = {
     ],
     glows: [{ name: 'M41', ra: hms(6, 46, 0), dec: dms(-20, 44), size: 16, tint: 'nebula-2' }],
   },
+
+  // Not a portfolio sector: drawn so the M13 capture sits in its real constellation.
+  Hercules: {
+    name: 'Hercules',
+    genitive: 'Herculis',
+    stars: [
+      star('Kornephoros', 'β Her', hms(16, 30, 13.2), dms(21, 29, 23), 2.77, 'G', 139),
+      star('Zeta Herculis', 'ζ Her', hms(16, 41, 17.2), dms(31, 36, 10), 2.81, 'G', 35),
+      star('Sarin', 'δ Her', hms(17, 15, 1.9), dms(24, 50, 21), 3.14, 'A', 75),
+      star('Pi Herculis', 'π Her', hms(17, 15, 2.8), dms(36, 48, 33), 3.16, 'K', 377),
+      star('Eta Herculis', 'η Her', hms(16, 42, 53.8), dms(38, 55, 20), 3.48, 'G', 112),
+      star('Gamma Herculis', 'γ Her', hms(16, 21, 55.2), dms(19, 9, 11), 3.75, 'A', 195),
+      star('Iota Herculis', 'ι Her', hms(17, 39, 27.9), dms(46, 0, 23), 3.8, 'B', 455),
+      star('Theta Herculis', 'θ Her', hms(17, 56, 15.2), dms(37, 15, 2), 3.86, 'K', 750),
+      star('Epsilon Herculis', 'ε Her', hms(17, 0, 17.4), dms(30, 55, 35), 3.92, 'A', 155),
+    ],
+    lines: [
+      // The Keystone
+      ['Zeta Herculis', 'Eta Herculis'],
+      ['Eta Herculis', 'Pi Herculis'],
+      ['Pi Herculis', 'Epsilon Herculis'],
+      ['Epsilon Herculis', 'Zeta Herculis'],
+      // Arms and legs
+      ['Zeta Herculis', 'Kornephoros'],
+      ['Kornephoros', 'Gamma Herculis'],
+      ['Epsilon Herculis', 'Sarin'],
+      ['Pi Herculis', 'Theta Herculis'],
+      ['Theta Herculis', 'Iota Herculis'],
+    ],
+    glows: [{ name: 'M13 Hercules Globular Cluster', ra: hms(16, 41, 41), dec: dms(36, 28), size: 9, tint: 'nebula-2' }],
+  },
 };
+
+/* Constellations drawn for context only (no portfolio sector), e.g. around photo targets. */
+export const contextConstellations = ['Hercules'];

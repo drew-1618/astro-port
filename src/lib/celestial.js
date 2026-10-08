@@ -82,7 +82,7 @@ export const spectralTemp = (spec) => SPECTRAL_TEMP[spec] ?? 0.5;
  *   glows      — real nebulae/clusters for the nebula layer.
  * Also returns `byItem`, an itemId → star info lookup for the UI.
  */
-export function buildSky(sectors, catalog, itemsFor) {
+export function buildSky(sectors, catalog, itemsFor, contextNames = []) {
   const named = {};
   Object.values(catalog).forEach((c) =>
     c.stars.forEach((s) => {
@@ -190,6 +190,27 @@ export function buildSky(sectors, catalog, itemsFor) {
     };
   });
 
+  // Context-only constellations (e.g. Hercules around M13): stars, figure and glows, no items.
+  sky.context = contextNames
+    .filter((n) => catalog[n])
+    .map((n) => {
+      const con = catalog[n];
+      const centerDir = new THREE.Vector3();
+      con.stars.forEach((s) => centerDir.add(raDecToDirection(s.ra, s.dec)));
+      const { ra } = directionToRaDec(centerDir.normalize());
+      const minDec = Math.min(...con.stars.map((s) => s.dec));
+      return {
+        name: con.name,
+        background: con.stars.map((s) => ({ ...named[s.name], temp: spectralTemp(s.spec) })),
+        lines: con.lines.filter(([a, b]) => named[a] && named[b]).map(([a, b]) => [named[a].position, named[b].position]),
+        glows: (con.glows || []).map((g) => ({
+          ...g,
+          position: raDecToDirection(g.ra, g.dec).multiplyScalar(skyRadius(1500) + 25).toArray(),
+        })),
+        labelPosition: raDecToDirection(ra, minDec - 4).multiplyScalar(300).toArray(),
+      };
+    });
+
   sky.allPoints = Object.values(sky.sectors).flatMap((sec) => sec.points);
   return sky;
 }
@@ -257,9 +278,14 @@ export function sectorPose(skySector, view = {}) {
   return framePose({ center: skySector.center, points: skySector.points, fov: 50, ...view });
 }
 
-/* Close-up on a single star, keeping a little of its neighbourhood in view. */
+/*
+ * Close-up on a single star, the way a telescope does it: stay back near the
+ * observer and narrow the field of view, rather than flying up to the star.
+ * Flying close breaks the sky's geometry (stars only a little nearer than
+ * the target end up beside or behind the camera), which hid Hercules around M13.
+ */
 export function itemPose(starPosition, view = {}) {
-  return framePose({ center: starPosition, minExtent: 9, fov: 42, margin: 1, minDistance: 40, ...view });
+  return framePose({ center: starPosition, minExtent: 9, fov: 30, margin: 1, minDistance: 220, ...view });
 }
 
 /* ── Sky coordinates ──────────────────────────────────────────────────────── */

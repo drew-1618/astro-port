@@ -7,6 +7,7 @@ import Nebula from './starfield/Nebula';
 import SectorCluster from './starfield/SectorCluster';
 import CameraRig from './starfield/CameraRig';
 import Ecliptic from './starfield/Ecliptic';
+import ContextConstellation from './starfield/ContextConstellation';
 
 /*
  * The 3D sky. Everything rendered here is derived from props: `sectors` come
@@ -27,7 +28,7 @@ export default function StarfieldCanvas({
   onSlewChange,
 }) {
   const colors = useThemeColors(theme);
-  const glows = useMemo(() => Object.values(sky.sectors).flatMap((s) => s.glows), [sky]);
+  const glows = useMemo(() => [...Object.values(sky.sectors), ...sky.context].flatMap((s) => s.glows), [sky]);
   // The Canvas camera is created once, at whatever pose the app starts in.
   const startPose = useRef(pose).current;
 
@@ -45,6 +46,9 @@ export default function StarfieldCanvas({
         <BackgroundStars colors={colors} />
         <Nebula glows={glows} colors={colors} />
         <Ecliptic colors={colors} />
+        {sky.context.map((con) => (
+          <ContextConstellation key={con.name} con={con} colors={colors} anyActive={activeSectorId !== null} />
+        ))}
         {sectors.map((sector) => (
           <SectorCluster
             key={sector.id}

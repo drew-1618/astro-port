@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { ArrowRight, ChevronDown, ChevronUp, MapPin, RadioTower } from 'lucide-react';
 import * as data from './data/portfolioData';
 import { buildSky, homePose, itemPose, sectorPose } from './lib/celestial';
-import { constellations } from './data/skyCatalog';
+import { constellations, contextConstellations } from './data/skyCatalog';
 import { SkyContext } from './lib/skyContext';
 import { DESKTOP_QUERY, useLayout, useMediaQuery, useViewport, viewportInsets } from './lib/layout';
 import { useAmbientAudio } from './lib/useAmbientAudio';
@@ -128,7 +128,7 @@ export default function App() {
     }
   }, [theme]);
 
-  const sky = useMemo(() => buildSky(sectors, constellations, sectorItems), []);
+  const sky = useMemo(() => buildSky(sectors, constellations, sectorItems, contextConstellations), []);
 
   const activeSector = sectors.find((s) => s.id === activeSectorId) || null;
 

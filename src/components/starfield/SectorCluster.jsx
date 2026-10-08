@@ -176,7 +176,7 @@ function useLabelLayout(stars, active) {
 }
 
 /* Catalog stars with no portfolio item: drawn so the constellation reads correctly, not interactive. */
-function BackgroundStar({ star, colors }) {
+export function BackgroundStar({ star, colors }) {
   const ref = useRef();
   const glow = useMemo(() => getGlowTexture(), []);
   const color = useMemo(() => starColor(star.temp, colors), [star.temp, colors]);
