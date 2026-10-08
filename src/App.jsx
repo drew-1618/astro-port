@@ -28,6 +28,8 @@ function readStoredTheme() {
  * Collapses to a small pill so it doesn't cover the sky.
  */
 function WelcomeCard({ collapsed, onToggle, onBegin, onComms, touch }) {
+  // Phones show a 3-line preview of the bio (2 in landscape) with a Read more toggle.
+  const [fullBio, setFullBio] = useState(false);
   if (collapsed) {
     return (
       <button
@@ -45,7 +47,7 @@ function WelcomeCard({ collapsed, onToggle, onBegin, onComms, touch }) {
     );
   }
   return (
-    <section data-occluder className="glass reticle pointer-events-auto fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] z-20 rounded-sm p-4 lg:inset-x-auto lg:bottom-20 lg:right-6 lg:w-[400px] land:inset-x-auto land:bottom-2 land:right-[max(0.5rem,env(safe-area-inset-right))] land:w-[min(340px,45vw)] land:p-3">
+    <section data-occluder className="glass reticle scrollbar-thin pointer-events-auto fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] z-20 max-h-[calc(100dvh-13rem)] overflow-y-auto overscroll-contain rounded-sm p-4 lg:inset-x-auto lg:max-h-none lg:overflow-visible land:max-h-[calc(100dvh-4.5rem)] lg:bottom-20 lg:right-6 lg:w-[400px] land:inset-x-auto land:bottom-2 land:right-[max(0.5rem,env(safe-area-inset-right))] land:w-[min(340px,45vw)] land:p-3">
       <div className="flex items-start justify-between gap-3">
         <p className="font-mono text-xs uppercase tracking-[0.12em] text-accent sm:tracking-[0.18em]">Observatory online · all-sky view</p>
         <button
@@ -62,7 +64,22 @@ function WelcomeCard({ collapsed, onToggle, onBegin, onComms, touch }) {
       <p className="flex items-center gap-1 font-mono text-[13px] text-muted">
         <MapPin size={12} aria-hidden /> {profile.location}
       </p>
-      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink/80 sm:line-clamp-none sm:text-[15px] land:hidden">{profile.summary}</p>
+      <p
+        className={`mt-2 text-sm leading-relaxed text-ink/80 sm:text-[15px] land:text-[13px] ${
+          fullBio ? '' : 'line-clamp-3 sm:line-clamp-none land:line-clamp-2'
+        }`}
+      >
+        {profile.summary}
+      </p>
+      <button
+        type="button"
+        onClick={() => setFullBio((v) => !v)}
+        aria-expanded={fullBio}
+        className="mt-1 inline-flex min-h-[32px] items-center gap-1 font-mono text-xs uppercase tracking-[0.12em] text-accent sm:hidden land:inline-flex"
+      >
+        {fullBio ? 'Show less' : 'Read more'}
+        {fullBio ? <ChevronUp size={13} aria-hidden /> : <ChevronDown size={13} aria-hidden />}
+      </button>
       <p className="mt-2 text-[13px] text-muted land:mt-1">
         {touch
           ? 'Tap a sector or any star to inspect it. Drag to look around, pinch to zoom.'
