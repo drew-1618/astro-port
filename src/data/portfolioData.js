@@ -28,7 +28,7 @@ export const profile = {
    * 'formspree' and use a Formspree form ID. Leave `key` empty and the form
    * opens the visitor's mail app instead.
    */
-  contact: { provider: 'web3forms', key: '' },
+  contact: { provider: 'web3forms', key: '001a0331-aa6c-47de-b3f3-e86c64e44647' },
   links: {
     github: 'https://github.com/drew-1618',
     linkedin: 'https://www.linkedin.com/in/andrew-garrett-j',
