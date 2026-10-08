@@ -47,7 +47,14 @@ All content lives in **`src/data/portfolioData.js`**. You never need to edit a c
 
 ### Still to fill in
 - `projects[].repo` / `projects[].demo`: once you add a URL, the button appears in the Observation Log.
-- `astrophotos` (M36, M37, M38, IC 405, IC 410 and M1, all real objects in Auriga and Taurus) and the Optical/Astrophotography Gear skill group are **sample data** (marked `// SAMPLE`). To use a real photo, put the file in `public/astro/` and set `image: '/astro/your-file.jpg'`. It replaces the generated placeholder, and the deploy base path is added automatically.
+- `astrophotos`: real captures live in `public/astro/` (full size, max 2400px) and `public/astro/thumbs/` (800px). Keep originals in the git-ignored `AstroPhotos/` folder. Gear and integration details are filled in only where the photo's EXIF data recorded them; fill in the rest (telescope, mount, sub counts, dates) and they'll appear automatically. The globular cluster is labeled M13: confirm that's right.
+
+  To add a photo:
+  ```bash
+  convert AstroPhotos/NAME.jpg -auto-orient -strip -resize '2400x2400>' -interlace JPEG -quality 84 public/astro/ID.jpg
+  convert AstroPhotos/NAME.jpg -auto-orient -strip -resize '800x800>'   -interlace JPEG -quality 80 public/astro/thumbs/ID.jpg
+  ```
+  Then add an entry to `astrophotos` with `image: '/astro/ID.jpg'` and `thumb: '/astro/thumbs/ID.jpg'`. Use `coords` for deep-sky targets, or `solarSystem: true` for the Sun, Moon, planets and comets, which are placed along the ecliptic.
 
 ## Structure
 

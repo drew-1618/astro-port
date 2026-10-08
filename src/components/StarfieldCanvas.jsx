@@ -6,6 +6,7 @@ import BackgroundStars from './starfield/BackgroundStars';
 import Nebula from './starfield/Nebula';
 import SectorCluster from './starfield/SectorCluster';
 import CameraRig from './starfield/CameraRig';
+import Ecliptic from './starfield/Ecliptic';
 
 /*
  * The 3D sky. Everything rendered here is derived from props: `sectors` come
@@ -43,6 +44,7 @@ export default function StarfieldCanvas({
       <Suspense fallback={null}>
         <BackgroundStars colors={colors} />
         <Nebula glows={glows} colors={colors} />
+        <Ecliptic colors={colors} />
         {sectors.map((sector) => (
           <SectorCluster
             key={sector.id}

@@ -32,8 +32,11 @@ function Bullets({ items }) {
   );
 }
 
+/* A metadata row counts as known unless its value is null / undefined / empty. */
+const known = ([, v]) => v !== null && v !== undefined && v !== '';
+
 function MetaGrid({ rows }) {
-  const visible = rows.filter(([, v]) => v !== null && v !== undefined && v !== '');
+  const visible = rows.filter(known);
   return (
     <dl className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
       {visible.map(([k, v]) => (
@@ -127,42 +130,50 @@ function RoleBody({ item }) {
 
 function PhotoBody({ item }) {
   const { optics, integration } = item;
+  const opticsRows = [
+    ['Telescope / Lens', optics.telescope],
+    ['Focal length', optics.focalLength],
+    ['Mount', optics.mount],
+    ['Camera', optics.camera],
+  ];
+  const integrationRows = [
+    ['Sub-exposures', integration.subs],
+    ['Sub length', integration.subExposure],
+    ['ISO / Gain', integration.isoGain],
+    ['Total time', integration.totalTime],
+    ['Filters', integration.filters],
+    ['Barlow', integration.barlow],
+  ];
   return (
     <>
-      <AstroMedia photo={item} eager className="-mx-4 mt-1 aspect-[4/3] sm:-mx-6 land:mx-auto land:h-[55dvh] land:w-auto" />
+      {item.image ? (
+        <AstroMedia photo={item} eager variant="full" className="-mx-4 mt-1 sm:-mx-6" />
+      ) : (
+        <AstroMedia photo={item} eager className="-mx-4 mt-1 aspect-[4/3] sm:-mx-6 land:mx-auto land:h-[55dvh] land:w-auto" />
+      )}
       <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted">
-        {item.type} · {item.date} · {item.location}
+        {[item.type, item.date, item.location].filter(Boolean).join(' · ')}
       </p>
       {item.notes && <p className="mt-3 text-[15px] leading-relaxed text-ink/90">{item.notes}</p>}
-      <Section title="Optical train">
-        <MetaGrid
-          rows={[
-            ['Telescope / Lens', optics.telescope],
-            ['Focal length', optics.focalLength],
-            ['Mount', optics.mount],
-            ['Camera', optics.camera],
-          ]}
-        />
-      </Section>
-      <Section title="Integration">
-        <MetaGrid
-          rows={[
-            ['Sub-exposures', integration.subs],
-            ['Sub length', integration.subExposure],
-            ['ISO / Gain', integration.isoGain],
-            ['Total time', integration.totalTime],
-            ['Filters', integration.filters],
-            ['Barlow', integration.barlow],
-          ]}
-        />
-      </Section>
-      <Section title="Processing">
-        <div className="flex flex-wrap gap-1.5">
-          {item.processing.map((t) => (
-            <SpectralBadge key={t} label={t} />
-          ))}
-        </div>
-      </Section>
+      {opticsRows.some(known) && (
+        <Section title="Optical train">
+          <MetaGrid rows={opticsRows} />
+        </Section>
+      )}
+      {integrationRows.some(known) && (
+        <Section title="Integration">
+          <MetaGrid rows={integrationRows} />
+        </Section>
+      )}
+      {item.processing.length > 0 && (
+        <Section title="Processing">
+          <div className="flex flex-wrap gap-1.5">
+            {item.processing.map((t) => (
+              <SpectralBadge key={t} label={t} />
+            ))}
+          </div>
+        </Section>
+      )}
     </>
   );
 }

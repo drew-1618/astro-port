@@ -10,6 +10,16 @@ export default function StarChip({ itemId, withCoords = false, className = '' })
   const star = useStarFor(itemId);
   if (!star) return null;
   const coords = `RA ${formatRA(star.ra)} · Dec ${formatDec(star.dec)}`;
+  // Solar-system objects move, so their plotted spot isn't a real coordinate; don't show one.
+  if (star.solarSystem) {
+    return (
+      <span className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted ${className}`}>
+        <Star size={10} aria-hidden className="text-accent-2" />
+        <span className="uppercase">Solar System</span>
+        {withCoords && <span className="text-muted/80">· plotted on the ecliptic</span>}
+      </span>
+    );
+  }
   return (
     <span className={`inline-flex flex-wrap items-center gap-x-1.5 font-mono text-[10px] tracking-wider text-muted ${className}`} title={coords}>
       <Star size={10} aria-hidden className="text-accent-2" />

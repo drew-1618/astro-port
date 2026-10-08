@@ -49,6 +49,25 @@ export function raDecToPosition(ra, dec, ly) {
   return raDecToDirection(ra, dec).multiplyScalar(skyRadius(ly));
 }
 
+/* Ecliptic longitude (degrees) → equatorial RA (hours) / Dec (degrees), J2000 obliquity. */
+const OBLIQUITY = THREE.MathUtils.degToRad(23.4393);
+export function eclipticToRaDec(lambdaDeg) {
+  const l = THREE.MathUtils.degToRad(lambdaDeg);
+  let ra = Math.atan2(Math.sin(l) * Math.cos(OBLIQUITY), Math.cos(l));
+  if (ra < 0) ra += Math.PI * 2;
+  return { ra: (ra / (Math.PI * 2)) * 24, dec: THREE.MathUtils.radToDeg(Math.asin(Math.sin(OBLIQUITY) * Math.sin(l))) };
+}
+
+/*
+ * Solar-system targets have no fixed position, so they're spaced along this
+ * stretch of the ecliptic, the path the Sun, Moon and planets really follow,
+ * which runs through Taurus and Gemini just south of Auriga.
+ */
+const SOLAR_SYSTEM_LAMBDA = [64, 106];
+
+/* Items farther than this from a sector's centre still get a real star, but don't stretch the camera framing. */
+const FRAMING_RADIUS_DEG = 35;
+
 /* Spectral class → 0 (hot/blue) … 1 (cool/red), used to tint stars between theme tokens. */
 const SPECTRAL_TEMP = { O: 0.05, B: 0.15, A: 0.35, F: 0.5, G: 0.65, K: 0.8, M: 0.95 };
 export const spectralTemp = (spec) => SPECTRAL_TEMP[spec] ?? 0.5;
@@ -84,10 +103,29 @@ export function buildSky(sectors, catalog, itemsFor) {
     const items = itemsFor(sector);
     const claimed = new Set(items.map((i) => i.star).filter(Boolean));
     const spare = con.stars.filter((s) => !claimed.has(s.name));
+    const solarItems = items.filter((i) => i.solarSystem);
 
     const stars = items.map((item, index) => {
       let info;
-      if (item.coords) {
+      if (item.solarSystem) {
+        const k = solarItems.indexOf(item);
+        const [l0, l1] = SOLAR_SYSTEM_LAMBDA;
+        const lambda = solarItems.length > 1 ? l0 + ((l1 - l0) * k) / (solarItems.length - 1) : (l0 + l1) / 2;
+        const { ra, dec } = eclipticToRaDec(lambda);
+        info = {
+          name: item.target || item.title,
+          designation: '',
+          ra,
+          dec,
+          mag: 5,
+          spec: null,
+          ly: 1500,
+          constellation: con.name,
+          deepSky: true,
+          solarSystem: true,
+        };
+        info.position = raDecToPosition(ra, dec, info.ly).toArray();
+      } else if (item.coords) {
         info = {
           name: item.catalogId || item.target || item.title,
           designation: item.catalogId || '',
@@ -96,7 +134,7 @@ export function buildSky(sectors, catalog, itemsFor) {
           mag: 5,
           spec: null,
           ly: item.coords.ly ?? DSO_DEFAULT_LY,
-          constellation: con.name,
+          constellation: item.coords.constellation ?? con.name,
           deepSky: true,
         };
         info.position = raDecToPosition(info.ra, info.dec, info.ly).toArray();
@@ -136,8 +174,10 @@ export function buildSky(sectors, catalog, itemsFor) {
     const labelPosition = raDecToDirection(centerRaDec.ra, minDec - 4).multiplyScalar(300).toArray();
 
     sky.sectors[sector.id] = {
-      // Everything that should be in frame when the sector is viewed.
-      points: [...stars.map((st) => st.position), ...background.map((st) => st.position)],
+      // Everything that should be in frame when the sector is viewed (far-flung items like M13 excepted).
+      points: [...stars, ...background]
+        .filter((st) => raDecToDirection(st.ra, st.dec).angleTo(centerDir) <= THREE.MathUtils.degToRad(FRAMING_RADIUS_DEG))
+        .map((st) => st.position),
       center: center.toArray(),
       ra: centerRaDec.ra,
       dec: centerRaDec.dec,

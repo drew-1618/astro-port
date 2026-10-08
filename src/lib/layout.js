@@ -16,7 +16,7 @@ export const LANDSCAPE_QUERY = '(orientation: landscape) and (max-height: 540px)
  */
 const CHROME = {
   desktop: { header: 72, footer: 52, dock: 256, panel: (w) => Math.min(540, w * 0.42) + 24 },
-  mobile: { header: 100, tabBar: 56, sheet: (h) => h * 0.52 + 8, sheetCollapsed: 92, welcome: 268 },
+  mobile: { header: 100, tabBar: 56, sheet: (h) => h * 0.52 + 8, sheetCollapsed: 92, welcome: 268, welcomePill: 76 },
   landscape: { header: 48, rail: 60, panel: (w) => Math.min(420, w * 0.5) + 16, welcome: (w) => Math.min(340, w * 0.45) + 16 },
 };
 
@@ -60,9 +60,10 @@ export function useViewport(delay = 200) {
 
 /*
  * Fractions of the viewport covered by UI on each side, given what's open.
+ * `welcome` is the intro card's state: 'open' | 'collapsed' (pill) | 'hidden'.
  * The camera framing (framePose in celestial.js) fits targets into the rest.
  */
-export function viewportInsets(layout, { w, h }, { panelOpen, sheetCollapsed, welcomeOpen }) {
+export function viewportInsets(layout, { w, h }, { panelOpen, sheetCollapsed, welcome = 'hidden' }) {
   const px = { top: 0, right: 0, bottom: 0, left: 0 };
   if (layout === 'desktop') {
     const c = CHROME.desktop;
@@ -76,13 +77,14 @@ export function viewportInsets(layout, { w, h }, { panelOpen, sheetCollapsed, we
     px.bottom = 8;
     px.left = c.rail;
     if (panelOpen) px.right = c.panel(w);
-    else if (welcomeOpen) px.right = c.welcome(w);
+    else if (welcome === 'open') px.right = c.welcome(w);
   } else {
     const c = CHROME.mobile;
     px.top = c.header;
     px.bottom = c.tabBar;
     if (panelOpen) px.bottom += sheetCollapsed ? c.sheetCollapsed : c.sheet(h);
-    else if (welcomeOpen) px.bottom += c.welcome;
+    else if (welcome === 'open') px.bottom += c.welcome;
+    else if (welcome === 'collapsed') px.bottom += c.welcomePill;
   }
   return { top: px.top / h, right: px.right / w, bottom: px.bottom / h, left: px.left / w };
 }

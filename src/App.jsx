@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, MapPin, RadioTower } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, MapPin, RadioTower } from 'lucide-react';
 import * as data from './data/portfolioData';
 import { buildSky, homePose, itemPose, sectorPose } from './lib/celestial';
 import { constellations } from './data/skyCatalog';
 import { SkyContext } from './lib/skyContext';
-import { useLayout, useMediaQuery, useViewport, viewportInsets } from './lib/layout';
+import { DESKTOP_QUERY, useLayout, useMediaQuery, useViewport, viewportInsets } from './lib/layout';
 import { useAmbientAudio } from './lib/useAmbientAudio';
 import StarfieldCanvas from './components/StarfieldCanvas';
 import HudOverlay from './components/HudOverlay';
@@ -25,12 +25,39 @@ function readStoredTheme() {
 /*
  * Intro card shown on the all-sky view. Sits above the tab bar on phones,
  * bottom-right on desktop, and as a compact right-hand card in landscape.
+ * Collapses to a small pill so it doesn't cover the sky.
  */
-function WelcomeCard({ onBegin, onComms, touch }) {
+function WelcomeCard({ collapsed, onToggle, onBegin, onComms, touch }) {
+  if (collapsed) {
+    return (
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded="false"
+        aria-label={`About ${profile.name}`}
+        className="glass reticle pointer-events-auto fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] left-3 z-20 flex touch-manipulation items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3.5 transition-colors hover:border-accent/50 active:bg-accent/10 lg:bottom-20 lg:left-auto lg:right-6 land:bottom-2 land:left-auto land:right-[max(0.5rem,env(safe-area-inset-right))]"
+      >
+        <span className="grid h-8 w-8 place-items-center rounded-full border border-accent/50 font-mono text-[10px] font-bold text-accent">{profile.initials}</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/80">About</span>
+        <ChevronUp size={14} aria-hidden className="text-muted" />
+      </button>
+    );
+  }
   return (
     <section className="glass reticle pointer-events-auto fixed inset-x-3 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+0.75rem)] z-20 rounded-sm p-4 lg:inset-x-auto lg:bottom-20 lg:right-6 lg:w-[400px] land:inset-x-auto land:bottom-2 land:right-[max(0.5rem,env(safe-area-inset-right))] land:w-[min(340px,45vw)] land:p-3">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent sm:tracking-[0.25em]">Observatory online · all-sky view</p>
-      <h1 className="mt-1.5 text-lg font-semibold text-ink sm:text-xl land:text-base">{profile.name}</h1>
+      <div className="flex items-start justify-between gap-3">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent sm:tracking-[0.25em]">Observatory online · all-sky view</p>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded="true"
+          aria-label="Collapse intro"
+          className="hud-btn -mr-1 -mt-1 min-h-[32px] min-w-[32px] shrink-0 px-1.5"
+        >
+          <ChevronDown size={15} aria-hidden />
+        </button>
+      </div>
+      <h1 className="text-lg font-semibold text-ink sm:text-xl land:text-base">{profile.name}</h1>
       <p className="flex items-center gap-1 font-mono text-[11px] text-muted">
         <MapPin size={12} aria-hidden /> {profile.location}
       </p>
@@ -52,6 +79,19 @@ function WelcomeCard({ onBegin, onComms, touch }) {
   );
 }
 
+const WELCOME_KEY = 'astro-port:welcome';
+
+/* Remembered per visitor; first visit starts collapsed on phones (sky first) and open on desktop. */
+function readWelcomeCollapsed() {
+  try {
+    const saved = localStorage.getItem(WELCOME_KEY);
+    if (saved) return saved === 'collapsed';
+  } catch {
+    /* storage unavailable */
+  }
+  return !window.matchMedia(DESKTOP_QUERY).matches;
+}
+
 export default function App() {
   const [theme, setTheme] = useState(readStoredTheme);
   const [activeSectorId, setActiveSectorId] = useState(null);
@@ -66,6 +106,11 @@ export default function App() {
   const { blip } = audio;
 
   const [sheetCollapsed, setSheetCollapsed] = useState(false);
+  const [welcomeCollapsed, setWelcomeCollapsed] = useState(readWelcomeCollapsed);
+  // Read by the framing below without being a dependency: folding the intro card
+  // shouldn't yank the camera, but the next slew (e.g. Recenter) uses the freed space.
+  const welcomeCollapsedRef = useRef(welcomeCollapsed);
+  welcomeCollapsedRef.current = welcomeCollapsed;
   const layout = useLayout();
   const viewport = useViewport();
   const touch = useMediaQuery('(pointer: coarse)');
@@ -93,7 +138,7 @@ export default function App() {
       insets: viewportInsets(layout, viewport, {
         panelOpen: Boolean(activeSector),
         sheetCollapsed,
-        welcomeOpen: !activeSector,
+        welcome: activeSector ? 'hidden' : welcomeCollapsedRef.current ? 'collapsed' : 'open',
       }),
     };
     const star = focused && sky.byItem[focused.itemId];
@@ -160,6 +205,17 @@ export default function App() {
     setSlewRequest((n) => n + 1);
   }, []);
 
+  const toggleWelcome = useCallback(() => {
+    setWelcomeCollapsed((c) => {
+      try {
+        localStorage.setItem(WELCOME_KEY, c ? 'open' : 'collapsed');
+      } catch {
+        /* storage unavailable — choice just won't persist */
+      }
+      return !c;
+    });
+  }, []);
+
   const recenter = useCallback(() => {
     setActiveSectorId(null);
     setFocused(null);
@@ -215,6 +271,8 @@ export default function App() {
 
       {!activeSector && (
         <WelcomeCard
+          collapsed={welcomeCollapsed}
+          onToggle={toggleWelcome}
           touch={touch}
           onBegin={() => selectSector(sectors[0].id)}
           onComms={() => selectItem('epsilon', 'comms')}

@@ -42,11 +42,12 @@ export default function GallerySection({ photos, highlightId, onOpen }) {
             <p className="font-mono text-[10px] uppercase tracking-widest text-muted">{p.type}</p>
             <StarChip itemId={p.id} />
             <dl className="mt-2">
+              <MetaRow label="Camera" value={p.optics.camera} />
               <MetaRow label="Optics" value={p.optics.telescope} />
-              <MetaRow label="Focal" value={p.optics.focalLength} wide />
-              <MetaRow label="Integ." value={p.integration.totalTime} />
-              <MetaRow label="Subs" value={`${p.integration.subs} × ${p.integration.subExposure}`} />
-              <MetaRow label="Gain" value={p.integration.isoGain} wide />
+              <MetaRow label="Date" value={p.date} />
+              <MetaRow label="Integ." value={p.integration.totalTime} wide />
+              <MetaRow label="Subs" value={p.integration.subs && `${p.integration.subs} × ${p.integration.subExposure}`} wide />
+              <MetaRow label="Exp." value={!p.integration.subs && p.integration.subExposure} wide />
               <MetaRow label="Proc." value={p.processing.join(', ')} wide />
             </dl>
           </div>

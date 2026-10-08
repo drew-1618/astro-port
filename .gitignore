@@ -1,3 +1,6 @@
 node_modules
 dist
 .DS_Store
+# Original full-resolution photos; web-sized copies live in public/astro/
+AstroPhotos/
+*:Zone.Identifier
