@@ -46,8 +46,9 @@ All content lives in **`src/data/portfolioData.js`**. You never need to edit a c
 - Catalog stars that no item uses are still drawn, dimmer and not clickable, so each constellation stays complete.
 
 ### Still to fill in
+- `profile.contact.key`: lets the contact form deliver messages straight to your inbox. Get a free access key at [web3forms.com](https://web3forms.com) by entering your email; the key arrives by email. Paste it in as `contact: { provider: 'web3forms', key: '...' }`. Formspree works too: `{ provider: 'formspree', key: '<form id>' }`. The key is safe to publish, since it can only send mail to you. Until a key is set, Transmit opens the visitor's mail app instead.
 - `projects[].repo` / `projects[].demo`: once you add a URL, the button appears in the Observation Log.
-- `astrophotos`: real captures live in `public/astro/` (full size, max 2400px) and `public/astro/thumbs/` (800px). Keep originals in the git-ignored `AstroPhotos/` folder. Gear and integration details are filled in only where the photo's EXIF data recorded them; fill in the rest (telescope, mount, sub counts, dates) and they'll appear automatically. The globular cluster is labeled M13: confirm that's right.
+- `astrophotos`: real captures live in `public/astro/` (full size, max 2400px) and `public/astro/thumbs/` (800px). Keep originals in the git-ignored `AstroPhotos/` folder. Gear and integration details are filled in only where the photo's EXIF data recorded them; fill in the rest (telescope, mount, sub counts, dates) and they'll appear automatically.
 
   To add a photo:
   ```bash
@@ -71,7 +72,7 @@ src/components/SectorPanel.jsx    sector drawer (bottom sheet on mobile)
 src/components/sections/*         projects, experience, skills, education
 src/components/GallerySection.jsx astrophotography grid
 src/components/ObservationModal.jsx   shared detail modal (project / role / photo)
-src/components/TransmissionTerminal.jsx   mailto: contact form
+src/components/TransmissionTerminal.jsx   contact form (direct send via src/lib/sendMessage.js, mailto fallback)
 ```
 
 ## Theming

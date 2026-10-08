@@ -21,6 +21,14 @@ export const profile = {
   // Observatory "site" shown in the HUD. Approximate, Cookeville TN.
   site: { name: 'Cookeville, TN', lat: 36.16, lon: -85.5 },
   email: 'andrewjohnson11235@gmail.com',
+  /*
+   * Contact form delivery (GitHub Pages has no server, so a form-to-email
+   * service relays messages to `email`). Paste a Web3Forms access key
+   * (https://web3forms.com, free, no account) or switch provider to
+   * 'formspree' and use a Formspree form ID. Leave `key` empty and the form
+   * opens the visitor's mail app instead.
+   */
+  contact: { provider: 'web3forms', key: '' },
   links: {
     github: 'https://github.com/drew-1618',
     linkedin: 'https://www.linkedin.com/in/andrew-garrett-j',
@@ -372,6 +380,7 @@ export const skills = [
  * photo's EXIF data); null fields are simply not shown.
  */
 const D3200_ECLIPSE = { telescope: '200mm telephoto lens', focalLength: '200mm', mount: null, camera: 'Nikon D3200' };
+const D3200 = { telescope: null, focalLength: null, mount: null, camera: 'Nikon D3200' };
 const UNKNOWN_OPTICS = { telescope: null, focalLength: null, mount: null, camera: null };
 const NO_INTEGRATION = { subs: null, subExposure: null, isoGain: null, totalTime: null, filters: null, barlow: null };
 
@@ -444,16 +453,14 @@ export const astrophotos = [
     solarSystem: true,
     image: '/astro/comet-c2022-e3-ztf.jpg',
     thumb: '/astro/thumbs/comet-c2022-e3-ztf.jpg',
-    optics: UNKNOWN_OPTICS,
+    optics: D3200,
     integration: NO_INTEGRATION,
     processing: [],
-    date: null,
+    date: '2023-01-28',
     location: null,
-    notes: 'The "green comet" of early 2023. Its coma glows green from diatomic carbon fluorescing in sunlight.',
+    notes: 'The "green comet", caught a few days before its closest approach to Earth on February 1, 2023. Its coma glows green from diatomic carbon fluorescing in sunlight.',
   },
   {
-    // TODO: confirm the target. It looks like M13 (Hercules Globular Cluster);
-    // if it's a different cluster, update the name, catalogId and coords.
     id: 'globular-cluster',
     target: 'Hercules Globular Cluster',
     catalogId: 'M13',
@@ -501,17 +508,17 @@ export const astrophotos = [
   {
     id: 'lunar-eclipse',
     target: 'Total Lunar Eclipse',
-    catalogId: 'Luna · Blood Moon',
+    catalogId: 'TLE 2025-03-14',
     type: 'Lunar Eclipse',
     solarSystem: true,
     image: '/astro/lunar-eclipse.jpg',
     thumb: '/astro/thumbs/lunar-eclipse.jpg',
-    optics: UNKNOWN_OPTICS,
+    optics: D3200,
     integration: NO_INTEGRATION,
     processing: [],
-    date: null,
+    date: '2025-03-14',
     location: null,
-    notes: 'The Moon inside Earth\'s umbra, lit only by sunlight filtered red through Earth\'s atmosphere.',
+    notes: 'The March 14, 2025 "Blood Worm Moon": the Moon inside Earth\'s umbra, lit only by sunlight filtered red through Earth\'s atmosphere.',
   },
   {
     id: 'jupiter',
