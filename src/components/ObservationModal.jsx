@@ -133,6 +133,7 @@ function PhotoBody({ item }) {
   const opticsRows = [
     ['Telescope / Lens', optics.telescope],
     ['Focal length', optics.focalLength],
+    ['Eyepiece', optics.eyepiece],
     ['Mount', optics.mount],
     ['Camera', optics.camera],
   ];

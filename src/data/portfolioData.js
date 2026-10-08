@@ -355,7 +355,10 @@ export const skills = [
     group: 'Optical/Astrophotography Gear',
     band: 'Hα',
     items: [
+      { name: 'Celestron NexStar 130 SLT', note: '130mm Newtonian · GoTo mount' },
       { name: 'Nikon D3200', note: 'DSLR' },
+      { name: '2× Barlow lens' },
+      { name: '8mm eyepiece', note: 'eyepiece projection' },
       { name: '200mm telephoto' },
       { name: 'Snapseed', note: 'processing' },
       { name: 'Eclipse & lunar imaging' },
@@ -381,6 +384,20 @@ export const skills = [
  */
 const D3200_ECLIPSE = { telescope: '200mm telephoto lens', focalLength: '200mm', mount: null, camera: 'Nikon D3200' };
 const D3200 = { telescope: null, focalLength: null, mount: null, camera: 'Nikon D3200' };
+// Celestron NexStar 130 SLT: 130mm f/5 Newtonian reflector on a computerized GoTo alt-az mount.
+const NEXSTAR_BARLOW = {
+  telescope: 'Celestron NexStar 130 SLT (130mm Newtonian)',
+  focalLength: '650mm · 1300mm with 2× Barlow',
+  mount: 'NexStar SLT GoTo alt-az',
+  camera: 'Nikon D3200',
+};
+const NEXSTAR_PROJECTION = {
+  telescope: 'Celestron NexStar 130 SLT (130mm Newtonian)',
+  focalLength: '650mm (eyepiece projection)',
+  eyepiece: '8mm',
+  mount: 'NexStar SLT GoTo alt-az',
+  camera: 'Nikon D3200',
+};
 const UNKNOWN_OPTICS = { telescope: null, focalLength: null, mount: null, camera: null };
 const NO_INTEGRATION = { subs: null, subExposure: null, isoGain: null, totalTime: null, filters: null, barlow: null };
 
@@ -408,8 +425,8 @@ export const astrophotos = [
     coords: { ra: hms(5, 35, 17), dec: dms(-5, 23, 28), constellation: 'Orion' },
     image: '/astro/m42-orion-nebula.jpg',
     thumb: '/astro/thumbs/m42-orion-nebula.jpg',
-    optics: UNKNOWN_OPTICS,
-    integration: NO_INTEGRATION,
+    optics: NEXSTAR_BARLOW,
+    integration: { ...NO_INTEGRATION, barlow: '2×' },
     processing: [],
     date: null,
     location: null,
@@ -468,8 +485,8 @@ export const astrophotos = [
     coords: { ra: hms(16, 41, 41), dec: dms(36, 27, 35), constellation: 'Hercules' },
     image: '/astro/globular-cluster.jpg',
     thumb: '/astro/thumbs/globular-cluster.jpg',
-    optics: UNKNOWN_OPTICS,
-    integration: NO_INTEGRATION,
+    optics: NEXSTAR_BARLOW,
+    integration: { ...NO_INTEGRATION, barlow: '2×' },
     processing: ['Snapseed'],
     date: null,
     location: null,
@@ -528,12 +545,12 @@ export const astrophotos = [
     solarSystem: true,
     image: '/astro/jupiter.jpg',
     thumb: '/astro/thumbs/jupiter.jpg',
-    optics: UNKNOWN_OPTICS,
+    optics: NEXSTAR_PROJECTION,
     integration: NO_INTEGRATION,
     processing: [],
     date: null,
     location: null,
-    notes: 'Cloud belts and the Great Red Spot.',
+    notes: 'Cloud belts and the Great Red Spot, shot by projecting the image through an 8mm eyepiece straight onto the camera sensor.',
   },
   {
     id: 'saturn',
@@ -543,7 +560,7 @@ export const astrophotos = [
     solarSystem: true,
     image: '/astro/saturn.jpg',
     thumb: '/astro/thumbs/saturn.jpg',
-    optics: UNKNOWN_OPTICS,
+    optics: NEXSTAR_PROJECTION,
     integration: NO_INTEGRATION,
     processing: ['Snapseed'],
     date: null,
