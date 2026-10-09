@@ -98,6 +98,7 @@ Navigation works like a planetarium or telescope (`src/components/starfield/Came
 - **Scroll / pinch:** zoom by changing the field of view (3°–100°) toward the point under the cursor or between your fingers. The FOV readout updates live.
 - **Drag / one finger:** look around from where you stand. The sky follows the pointer at any zoom and keeps a little momentum when you let go.
 - **Shift+drag / right-drag:** orbit around the current target to see the real 3D depth between stars.
+- **Arrow keys:** look around (Shift+arrows orbit). Speed scales with zoom, and the view eases to a stop on release. Ignored while the detail modal is open (←/→ step entries there), in form fields, and when focus is inside a scrollable panel.
 - **Swipe left/right in a detail view (touch):** previous / next entry.
 - Clicking a sector, a star or Recenter moves the camera to that view, undoing any manual zoom or drag.
 

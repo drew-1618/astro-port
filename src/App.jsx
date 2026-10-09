@@ -83,7 +83,7 @@ function WelcomeCard({ collapsed, onToggle, onBegin, onComms, touch }) {
       <p className="mt-2 text-[13px] text-muted land:mt-1">
         {touch
           ? 'Tap a sector or any star to inspect it. Drag to look around, pinch to zoom.'
-          : 'Pick a sector to slew the mount, or click any star to inspect it. Drag to look around, scroll to zoom.'}
+          : 'Pick a sector to slew the mount, or click any star to inspect it. Drag or use the arrow keys to look around, scroll to zoom.'}
       </p>
       <div className="mt-3 flex gap-2 land:mt-2">
         <button type="button" onClick={onBegin} className="hud-btn flex-1 border-accent/60 text-accent hover:bg-accent/10 sm:flex-none">

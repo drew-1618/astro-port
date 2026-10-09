@@ -11,6 +11,8 @@ import * as THREE from 'three';
  *                     pointer 1:1 at any zoom, with a little momentum.
  *   shift- or right-drag   orbit around the current target to see the real
  *                     3D depth between stars.
+ *   arrow keys        look around (shift+arrows orbit); the turn rate scales
+ *                     with the FOV so it feels the same at any zoom.
  * Whenever `pose` changes (a sector or star was selected, or Recenter), input
  * is suspended and position, look-at target and FOV are tweened together as a
  * slew; control returns on arrival.
@@ -21,6 +23,27 @@ const ZOOM_SPEED = 0.0012; // per wheel delta unit, exponential
 const ORBIT_SPEED = 0.005; // radians per pixel
 const MAX_ELEVATION = THREE.MathUtils.degToRad(88);
 const INERTIA_DECAY = 6; // per second
+const KEY_LOOK_SPEED = 0.6; // fields of view per second
+const KEY_ORBIT_SPEED = 0.9; // radians per second
+const KEY_RAMP = 8; // per second; how quickly held keys reach full speed
+const ARROWS = {
+  ArrowLeft: { az: 1, el: 0 },
+  ArrowRight: { az: -1, el: 0 },
+  ArrowUp: { az: 0, el: 1 },
+  ArrowDown: { az: 0, el: -1 },
+};
+
+/* Arrow keys belong to whatever has focus when it uses them: form fields, the
+ * detail modal (prev/next) and scrollable panels. */
+function keyClaimedElsewhere(target) {
+  if (document.querySelector('[aria-modal="true"]')) return true;
+  for (let n = target; n && n !== document.body && n.nodeType === 1; n = n.parentElement) {
+    if (n.matches('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return true;
+    const { overflowY } = getComputedStyle(n);
+    if ((overflowY === 'auto' || overflowY === 'scroll') && n.scrollHeight > n.clientHeight) return true;
+  }
+  return false;
+}
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -41,6 +64,8 @@ export default function CameraRig({ pose, reducedMotion, onSlewChange, cameraRef
   const targetFov = useRef(pose.fov);
   const zoomAnchor = useRef({ x: 0, y: 0 });
   const velocity = useRef({ az: 0, el: 0 });
+  const heldKeys = useRef(new Set());
+  const orbitKeys = useRef(false);
   const sizeRef = useRef(size);
   sizeRef.current = size;
 
@@ -190,12 +215,27 @@ export default function CameraRig({ pose, reducedMotion, onSlewChange, cameraRef
 
     const onContextMenu = (e) => e.preventDefault();
 
+    const onKeyDown = (e) => {
+      if (!ARROWS[e.key] || e.altKey || e.ctrlKey || e.metaKey || keyClaimedElsewhere(e.target)) return;
+      e.preventDefault();
+      heldKeys.current.add(e.key);
+      orbitKeys.current = e.shiftKey;
+    };
+    const onKeyUp = (e) => {
+      heldKeys.current.delete(e.key);
+      if (e.key === 'Shift') orbitKeys.current = false;
+    };
+    const releaseKeys = () => heldKeys.current.clear();
+
     window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
     el.addEventListener('wheel', onWheel, { passive: false });
     el.addEventListener('contextmenu', onContextMenu);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', releaseKeys);
     return () => {
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
@@ -203,6 +243,9 @@ export default function CameraRig({ pose, reducedMotion, onSlewChange, cameraRef
       window.removeEventListener('pointercancel', onPointerUp);
       el.removeEventListener('wheel', onWheel);
       el.removeEventListener('contextmenu', onContextMenu);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', releaseKeys);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gl, camera]);
@@ -231,11 +274,30 @@ export default function CameraRig({ pose, reducedMotion, onSlewChange, cameraRef
       }
 
       const v = velocity.current;
+      const keys = { az: 0, el: 0 };
+      heldKeys.current.forEach((k) => {
+        keys.az += ARROWS[k].az;
+        keys.el += ARROWS[k].el;
+      });
+      const steering = keys.az !== 0 || keys.el !== 0;
+      if (steering && orbitKeys.current) {
+        v.az = 0;
+        v.el = 0;
+        turn(keys.az * KEY_ORBIT_SPEED * delta, -keys.el * KEY_ORBIT_SPEED * delta, 'orbit');
+      } else if (steering) {
+        // Ease toward full speed; on release the usual momentum carries it to a stop.
+        const speed = KEY_LOOK_SPEED * THREE.MathUtils.degToRad(camera.fov);
+        const ramp = Math.min(1, delta * KEY_RAMP);
+        v.az += (keys.az * speed - v.az) * ramp;
+        v.el += (keys.el * speed - v.el) * ramp;
+      }
       if (Math.abs(v.az) + Math.abs(v.el) > 1e-4) {
         turn(v.az * delta, v.el * delta, 'look');
-        const decay = Math.exp(-INERTIA_DECAY * delta);
-        v.az *= decay;
-        v.el *= decay;
+        if (!steering) {
+          const decay = Math.exp(-INERTIA_DECAY * delta);
+          v.az *= decay;
+          v.el *= decay;
+        }
       }
     }
     camera.up.copy(UP);
